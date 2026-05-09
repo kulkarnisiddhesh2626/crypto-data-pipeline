@@ -1,0 +1,28 @@
+{
+    "data": [
+        {
+            "id": "bitcoin",
+            "symbol": "BTC",
+            "rank": "1",
+            "priceUsd": "64230.50",
+            "volumeUsd24Hr": "12000000000",
+            "marketCapUsd": "1200000000000"
+        },
+        {
+            "id": "ethereum",
+            "symbol": "ETH",
+            "rank": "2",
+            "priceUsd": "3450.75",
+            "volumeUsd24Hr": "8000000000",
+            "marketCapUsd": "400000000000"
+        },
+        {
+            "id": "solana",
+            "symbol": "SOL",
+            "rank": "3",
+            "priceUsd": "145.20",
+            "volumeUsd24Hr": "1500000000",
+            "marketCapUsd": "65000000000"
+        }
+    ]
+}
