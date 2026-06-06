@@ -162,4 +162,13 @@ else:
 
     # --- TAB 4: GOLD LAYER ---
     with tab_gold:
-        st.subheader("🥇 PHASE 3: DATA WAREHOUSE
+        st.subheader("🥇 PHASE 3: DATA WAREHOUSE (GOLD)")
+        st.markdown("*Purpose: Load the cleaned data into a structured Relational Database. Append an `ingested_at` timestamp to track historical trends so Business Analysts can query time-series data.*")
+        st.code("SQL QUERY: SELECT * FROM gold_crypto_prices ORDER BY ingested_at DESC", language='sql')
+        
+        # Load data descending so the newest stuff is at the top of the table
+        conn = sqlite3.connect('data/crypto_warehouse.db')
+        df_gold_desc = pd.read_sql("SELECT * FROM gold_crypto_prices ORDER BY ingested_at DESC", conn)
+        conn.close()
+        
+        st.dataframe(df_gold_desc, use_container_width=True)
