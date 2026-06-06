@@ -5,6 +5,7 @@ import glob
 from datetime import datetime
 
 def load_to_gold():
+    os.makedirs('data', exist_ok=True)
     print("Starting Gold Layer Data Warehouse Load...")
     
     list_of_files = glob.glob('data/silver/*.parquet')
