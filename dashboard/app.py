@@ -27,34 +27,46 @@ st.markdown("""
     .stApp { background-color: #0b1622; color: #f0f4f8; }
     h1, h2, h3, h4, p, label { color: #f0f4f8 !important; font-family: 'Segoe UI', Tahoma, sans-serif; }
     
-    /* Big Execute Button Styling */
-    .execute-btn button {
-        background-color: #00d2ff; background-image: linear-gradient(to right, #00d2ff 0%, #3a7bd5 100%);
-        color: white !important; font-size: 24px !important; font-weight: 800; padding: 20px !important; 
-        border-radius: 12px; border: none; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.4); transition: all 0.3s;
+    /* Fixed Button Styling - Clearly visible */
+    .stButton>button {
+        background-color: #2196f3 !important; 
+        color: #ffffff !important; 
+        font-size: 16px !important; 
+        font-weight: bold !important; 
+        padding: 12px 24px !important; 
+        border-radius: 8px !important; 
+        border: 1px solid #1e88e5 !important;
+        transition: all 0.3s;
     }
-    .execute-btn button:hover { transform: scale(1.02); box-shadow: 0 15px 25px rgba(0, 210, 255, 0.6); }
+    .stButton>button:hover { 
+        background-color: #1565c0 !important; 
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5) !important; 
+    }
     
-    /* Back Button Styling */
+    /* Back Button Override */
     .back-btn button {
-        background-color: transparent; color: #a0b4c7 !important; border: 1px solid #3a7bd5; 
-        border-radius: 6px; padding: 5px 15px; margin-bottom: 20px; transition: 0.3s;
+        background-color: transparent !important; color: #a0b4c7 !important; border: 1px solid #3a7bd5 !important; 
+        border-radius: 6px !important; padding: 5px 15px !important; margin-bottom: 20px !important; font-size: 14px !important;
     }
-    .back-btn button:hover { background-color: #1a2a40; color: white !important; }
+    .back-btn button:hover { background-color: #1a2a40 !important; color: white !important; }
     
-    /* Expanded Architectural Flowchart CSS */
+    /* Enhanced Architectural Flowchart CSS */
     .flow-container {
-        display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;
-        background-color: #132235; padding: 30px; border-radius: 16px; border: 1px solid #1e3a5f;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.5); margin-bottom: 40px;
+        display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 12px;
+        background-color: #132235; padding: 40px 20px; border-radius: 16px; border: 1px solid #1e3a5f;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.5); margin-bottom: 30px;
     }
     .flow-box {
-        background: #1a2a40; border: 2px solid #3a7bd5; border-radius: 12px; 
-        padding: 20px 10px; text-align: center; color: white; width: 14%; min-width: 140px;
+        background: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 8px; 
+        padding: 15px; text-align: center; color: white; width: 14.5%; min-width: 150px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .icon { font-size: 30px; margin-bottom: 10px; }
-    .flow-box h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: bold; }
-    .flow-box p { margin: 0; font-size: 12px; color: #a0b4c7 !important; line-height: 1.3; }
+    .icon { font-size: 35px; margin-bottom: 5px; }
+    .flow-box h4 { margin: 0 0 10px 0; font-size: 15px; font-weight: bold; letter-spacing: 0.5px; }
+    .flow-details {
+        text-align: left; font-size: 11px; color: #a0b4c7; margin-top: 10px; 
+        padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); line-height: 1.6;
+    }
     
     /* Color Codes */
     .source { border-color: #4caf50; }
@@ -63,50 +75,80 @@ st.markdown("""
     .gold { border-color: #ffd700; }
     .analytics { border-color: #9c27b0; }
     .ai-layer { border-color: #00bcd4; }
-    .flow-arrow { color: #3a7bd5; font-size: 24px; font-weight: bold; }
+    .flow-arrow { color: #3a7bd5; font-size: 20px; font-weight: bold; align-self: center; margin-top: 50px; }
     
     /* KPI Cards */
     [data-testid="stMetric"] { background-color: #1a2a40; border-left: 5px solid #3a7bd5; padding: 15px; border-radius: 8px; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- THE COMPLETE ARCHITECTURAL FLOWCHART (HTML) ---
+# --- THE ENHANCED ARCHITECTURAL FLOWCHART (HTML) ---
 flowchart_html = """
 <div class="flow-container">
     <div class="flow-box source">
         <div class="icon">🌐</div>
         <h4 style="color: #4caf50;">1. API Source</h4>
-        <p>Live CoinCap Data<br>(Python Requests)</p>
+        <div class="flow-details">
+            • <b>Provider:</b> CoinCap API<br>
+            • <b>Method:</b> HTTPS GET<br>
+            • <b>Payload:</b> Nested Arrays<br>
+            • <b>Resilience:</b> Try/Except Fallback
+        </div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box bronze">
         <div class="icon">🥉</div>
         <h4 style="color: #cd7f32;">2. Bronze</h4>
-        <p>Raw Lake Backup<br>(Untyped JSON)</p>
+        <div class="flow-details">
+            • <b>Goal:</b> Data Lineage<br>
+            • <b>Format:</b> Raw .json<br>
+            • <b>Storage:</b> Data Lake<br>
+            • <b>State:</b> Untransformed
+        </div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box silver">
         <div class="icon">🥈</div>
         <h4 style="color: #c0c0c0;">3. Silver</h4>
-        <p>Cleansed & Typed<br>(PyArrow Parquet)</p>
+        <div class="flow-details">
+            • <b>Goal:</b> Cleanse & Type<br>
+            • <b>Format:</b> Columnar Parquet<br>
+            • <b>Engine:</b> PyArrow/Pandas<br>
+            • <b>State:</b> Filtered Data
+        </div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box gold">
         <div class="icon">🥇</div>
         <h4 style="color: #ffd700;">4. Gold</h4>
-        <p>Data Warehouse<br>(SQLite Relational DB)</p>
+        <div class="flow-details">
+            • <b>Goal:</b> Business Ready<br>
+            • <b>Format:</b> Relational SQLite<br>
+            • <b>Schema:</b> Time-Series<br>
+            • <b>Action:</b> Audit Appends
+        </div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box analytics">
         <div class="icon">📊</div>
         <h4 style="color: #9c27b0;">5. Serving UI</h4>
-        <p>Metrics & Charts<br>(Streamlit Engine)</p>
+        <div class="flow-details">
+            • <b>Goal:</b> Visual Analytics<br>
+            • <b>Engine:</b> Streamlit<br>
+            • <b>Query:</b> SQL Select<br>
+            • <b>Metrics:</b> Live KPIs
+        </div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box ai-layer">
         <div class="icon">🤖</div>
         <h4 style="color: #00bcd4;">6. AI/Logic</h4>
-        <p>Automated Insights<br>(Data Inferences)</p>
+        <div class="flow-details">
+            • <b>Goal:</b> Smart Summaries<br>
+            • <b>Compute:</b> Pandas Agg.<br>
+            • <b>Output:</b> Text Inferences<br>
+            • <b>Insight:</b> Market Trends
+        </div>
     </div>
 </div>
 """
@@ -134,20 +176,20 @@ if not st.session_state.pipeline_executed:
     # Show the Detailed Flowchart
     st.markdown(flowchart_html, unsafe_allow_html=True)
     
-    # Big Execute Button
-    st.markdown("<div class='execute-btn'>", unsafe_allow_html=True)
-    if st.button("▶ EXECUTE DE WORKFLOW", use_container_width=True):
-        with st.spinner("Initializing Complete Medallion Pipeline..."):
-            time.sleep(1) # Visual effect
-            execute_pipeline()
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Bottom Left Execute Button
+    col1, col2, col3 = st.columns([1.5, 2, 1])
+    with col1:
+        if st.button("▶ EXECUTE DE WORKFLOW", use_container_width=True):
+            with st.spinner("Initializing Complete Medallion Pipeline..."):
+                time.sleep(1) # Visual effect
+                execute_pipeline()
+            st.rerun()
 
 # ==========================================
 # PAGE 2: THE UNLOCKED DASHBOARD TABS
 # ==========================================
 else:
-    # Back Button (Hides the data and returns to the Architecture view)
+    # Back Button
     st.markdown("<div class='back-btn'>", unsafe_allow_html=True)
     if st.button("⬅️ Back to Architecture Diagram"):
         st.session_state.pipeline_executed = False
@@ -208,7 +250,11 @@ else:
         
         st.markdown("---")
         st.subheader("📈 Asset Price History (Time-Series)")
-        chart_data = df.pivot(index='ingested_at', columns='symbol', values='priceUsd')
+        
+        # === FIX FOR THE VALUE ERROR ===
+        # Drop duplicates before pivoting to ensure index uniqueness
+        clean_df = df.drop_duplicates(subset=['ingested_at', 'symbol'])
+        chart_data = clean_df.pivot(index='ingested_at', columns='symbol', values='priceUsd')
         st.line_chart(chart_data)
         
     # Sidebar Data Stats
