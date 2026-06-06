@@ -13,52 +13,56 @@ from scripts.transform_silver import transform_to_silver
 from scripts.load_gold import load_to_gold
 
 # --- Page Configuration ---
-st.set_page_config(page_title="DE Pipeline Engine", page_icon="💻", layout="wide")
+st.set_page_config(page_title="DE Pipeline Engine", page_icon="📊", layout="wide")
 
-# --- ADVANCED CYBERPUNK / TECH GEEK CSS ---
+# --- CLEAN ENTERPRISE CSS ---
 st.markdown("""
     <style>
-    /* Dark background and neon green text */
+    /* Professional Dark Blue Theme */
     .stApp {
-        background-color: #0a0a0a;
-        color: #39ff14;
+        background-color: #0b1622;
+        color: #f0f4f8;
     }
-    h1, h2, h3, p, label, .stMarkdown {
-        color: #39ff14 !important;
-        font-family: 'Courier New', Courier, monospace;
+    [data-testid="stSidebar"] {
+        background-color: #132235;
+    }
+    /* Safe text color overrides that won't break icons */
+    h1, h2, h3, h4, h5, h6, p, label {
+        color: #f0f4f8 !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     /* Metric Cards Styling */
-    .stMetric {
-        background-color: #111111;
-        border: 1px solid #39ff14;
+    [data-testid="stMetric"] {
+        background-color: #1a2a40;
+        border-left: 5px solid #2196f3;
         padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
-    div[data-testid="stMetricValue"] {
-        color: #ffffff !important;
-        font-weight: bold;
+    [data-testid="stMetricValue"] {
+        color: #64b5f6 !important;
     }
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #050505;
-        border-right: 2px solid #39ff14;
-    }
-    /* Custom Button Animation */
+    /* Sleek Button Styling */
     .stButton>button {
-        border: 1px solid #39ff14;
-        color: #39ff14;
-        background-color: transparent;
-        font-family: 'Courier New', monospace;
+        background-color: #2196f3;
+        color: white !important;
+        border-radius: 6px;
+        border: none;
         font-weight: bold;
-        transition: 0.3s ease-in-out;
+        transition: all 0.3s ease;
         width: 100%;
     }
     .stButton>button:hover {
-        box-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
-        background-color: #39ff14;
-        color: #000000;
-        border: 1px solid #ffffff;
+        background-color: #42a5f5;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        color: white !important;
+    }
+    /* Clean Tab Styling */
+    .stTabs [data-baseweb="tab"] {
+        color: #8da1b9;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #2196f3 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -80,93 +84,85 @@ def load_gold_data():
 df = load_gold_data()
 
 # --- HEADER ---
-st.title("💻 SYSTEM: DATA_ENGINEERING_PIPELINE")
-st.markdown("> **STATUS: ONLINE | ARCHITECTURE: MEDALLION | DOMAIN: CRYPTO**")
+st.title("🚀 Enterprise Data Pipeline Architecture")
+st.markdown("Automated ETL workflow transforming live API data into an analytical Data Warehouse.")
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.header("TERMINAL // CONTROL")
-    if st.button("▶ EXECUTE_ETL_SEQUENCE()"):
-        with st.spinner("INITIATING EXTRACT ➔ TRANSFORM ➔ LOAD..."):
+    st.header("⚙️ Pipeline Controls")
+    if st.button("🔄 Execute ETL Workflow"):
+        with st.spinner("Extracting (Bronze) ➔ Transforming (Silver) ➔ Loading (Gold)..."):
             extract_crypto_data()
             transform_to_silver()
             load_to_gold()
-        st.success("SEQUENCE COMPLETE. WAREHOUSE UPDATED.")
+        st.success("Pipeline Run Complete!")
         st.rerun()
         
     st.markdown("---")
     if not df.empty:
         latest_time = df['ingested_at'].max()
-        st.metric("TOTAL_DB_RECORDS", len(df))
-        st.text(f"LAST_SYNC:\n{latest_time}")
+        st.metric("Total Warehouse Records", len(df))
+        st.text(f"Last Synced:\n{latest_time}")
 
 # --- MAIN CONTENT TABS ---
 if df.empty:
-    st.warning("SYSTEM EMPTY. PLEASE EXECUTE PIPELINE FROM CONTROL TERMINAL.")
+    st.info("The Data Warehouse is currently empty. Click 'Execute ETL Workflow' in the sidebar to run the pipeline.")
 else:
     latest_time = df['ingested_at'].max()
     latest_df = df[df['ingested_at'] == latest_time]
 
-    # Create the educational tabs!
     tab_dash, tab_bronze, tab_silver, tab_gold = st.tabs([
-        "📊 EXECUTIVE_DASHBOARD", 
-        "🥉 BRONZE_LAYER (Raw)", 
-        "🥈 SILVER_LAYER (Clean)", 
-        "🥇 GOLD_LAYER (Warehouse)"
+        "📊 Executive Dashboard", 
+        "🥉 Bronze Layer (Raw)", 
+        "🥈 Silver Layer (Clean)", 
+        "🥇 Gold Layer (Warehouse)"
     ])
 
     # --- TAB 1: DASHBOARD ---
     with tab_dash:
-        st.subheader("MARKET_SNAPSHOT // LATEST")
+        st.subheader("Live Market Snapshot")
         cols = st.columns(len(latest_df))
         for index, row in latest_df.reset_index().iterrows():
             with cols[index]:
                 price = f"${row['priceUsd']:,.2f}"
-                st.metric(label=f"TICKER: {row['symbol']}", value=price)
+                st.metric(label=f"{row['symbol']}", value=price)
         
         st.markdown("---")
-        st.subheader("TIME_SERIES_ANALYSIS")
+        st.subheader("Price History Trends")
         chart_data = df.pivot(index='ingested_at', columns='symbol', values='priceUsd')
         st.line_chart(chart_data)
 
     # --- TAB 2: BRONZE LAYER ---
     with tab_bronze:
-        st.subheader("🥉 PHASE 1: DATA EXTRACTION (BRONZE)")
-        st.markdown("*Purpose: Ingest raw, untyped, nested data from external APIs without modification. This ensures data lineage and provides a backup if downstream processes fail.*")
+        st.subheader("Data Extraction: Bronze Layer")
+        st.markdown("*Ingests raw JSON payloads from the external API to maintain data lineage and historical backups.*")
         bronze_file = get_latest_file('data/bronze', '.json')
         if bronze_file:
-            st.code(f"READING RAW SOURCE: {bronze_file}", language='bash')
+            st.code(f"File Path: {bronze_file}", language='bash')
             with open(bronze_file, 'r') as f:
                 raw_json = json.load(f)
-            # Show exactly what the raw API data looks like
             st.json(raw_json)
-        else:
-            st.error("No Bronze files found.")
 
     # --- TAB 3: SILVER LAYER ---
     with tab_silver:
-        st.subheader("🥈 PHASE 2: TRANSFORMATION (SILVER)")
-        st.markdown("*Purpose: Flatten messy JSON, cast strings to floats/integers, drop unneeded columns, and compress into columnar Parquet files for high-speed processing.*")
+        st.subheader("Data Transformation: Silver Layer")
+        st.markdown("*Flattens JSON structure, enforces schema datatypes, and compresses the output into columnar Parquet files.*")
         silver_file = get_latest_file('data/silver', '.parquet')
         if silver_file:
-            st.code(f"READING PARQUET ENGINE: {silver_file}", language='bash')
+            st.code(f"File Path: {silver_file}", language='bash')
             df_silver = pd.read_parquet(silver_file)
             st.dataframe(df_silver, use_container_width=True)
             
-            st.markdown("**Data Types fixed by Python (Pandas) in this layer:**")
-            # Show the data types to prove you cleaned them
+            st.markdown("**Schema Enforcement (Data Types):**")
             dtypes_df = df_silver.dtypes.astype(str).reset_index().rename(columns={'index':'Column Name', 0:'Data Type'})
             st.dataframe(dtypes_df, hide_index=True)
-        else:
-            st.error("No Silver files found.")
 
     # --- TAB 4: GOLD LAYER ---
     with tab_gold:
-        st.subheader("🥇 PHASE 3: DATA WAREHOUSE (GOLD)")
-        st.markdown("*Purpose: Load the cleaned data into a structured Relational Database. Append an `ingested_at` timestamp to track historical trends so Business Analysts can query time-series data.*")
-        st.code("SQL QUERY: SELECT * FROM gold_crypto_prices ORDER BY ingested_at DESC", language='sql')
+        st.subheader("Data Warehouse: Gold Layer")
+        st.markdown("*Loads cleaned data into a relational database, appending ingestion timestamps for time-series analytics.*")
+        st.code("SELECT * FROM gold_crypto_prices ORDER BY ingested_at DESC", language='sql')
         
-        # Load data descending so the newest stuff is at the top of the table
         conn = sqlite3.connect('data/crypto_warehouse.db')
         df_gold_desc = pd.read_sql("SELECT * FROM gold_crypto_prices ORDER BY ingested_at DESC", conn)
         conn.close()
