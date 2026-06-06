@@ -4,6 +4,7 @@ import os
 import glob
 
 def transform_to_silver():
+    os.makedirs('data/silver', exist_ok=True)
     print("Starting Silver Layer Transformation...")
     
     # 1. Find the newest file in the bronze folder automatically
