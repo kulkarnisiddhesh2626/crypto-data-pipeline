@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 
 def extract_crypto_data():
+    os.makedirs('data/bronze', exist_ok=True)
     url = "https://api.coincap.io/v2/assets"
     print(f"Attempting to fetch live crypto data from {url}...")
     
