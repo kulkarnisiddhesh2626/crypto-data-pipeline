@@ -31,7 +31,7 @@ st.markdown("""
     .stApp { background-color: #0b1622; color: #f0f4f8; }
     h1, h2, h3, h4, p, label { color: #f0f4f8 !important; font-family: 'Segoe UI', sans-serif; }
     
-    /* MODIFICATION 1: Change background of execute & back button to green, maximize text, center layout */
+    /* MODIFICATION 1: Green background, max text size, centered button behavior */
     .stButton>button {
         background-color: #4caf50 !important; 
         color: white !important; 
@@ -48,7 +48,7 @@ st.markdown("""
         transform: scale(1.02);
     }
     
-    /* MODIFICATION 2: Make the primary application tabs huge, highly visible and distinct at the top */
+    /* MODIFICATION 2: Massive, highly visible tab headers at the top */
     button[data-baseweb="tab"] {
         height: 60px !important;
     }
@@ -62,24 +62,25 @@ st.markdown("""
         border-bottom: 3px solid #4caf50;
     }
     
+    /* Flowchart and Metric Styling */
     .flow-container {
-        display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 12px;
-        background-color: #132235; padding: 30px 20px; border-radius: 16px; border: 1px solid #1e3a5f; margin-bottom: 30px;
+        display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 10px;
+        background-color: #132235; padding: 30px 10px; border-radius: 16px; border: 1px solid #1e3a5f; margin-bottom: 30px;
     }
-    .flow-box { background: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 8px; padding: 15px; text-align: center; width: 14.5%; min-width: 150px; }
-    .flow-details { text-align: left; font-size: 11px; color: #a0b4c7; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; }
+    .flow-box { background: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 8px; padding: 12px; text-align: center; width: 15%; min-width: 140px; }
+    .flow-details { text-align: left; font-size: 11px; color: #a0b4c7; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; line-height: 1.5; }
     .flow-arrow { color: #3a7bd5; font-size: 20px; font-weight: bold; align-self: center; margin-top: 40px; }
     [data-testid="stMetric"] { background-color: #1a2a40; border-left: 5px solid #4caf50; padding: 15px; border-radius: 8px; }
     .signal-box { padding: 20px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; font-size: 18px; text-align: center; }
-    .timestamp-badge { background-color: #263238; color: #00e676 !important; font-family: monospace; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+    .timestamp-badge { background-color: #263238; color: #00e676 !important; font-family: monospace; padding: 2px 6px; border-radius: 4px; font-size: 10px; display: inline-block; margin-top: 4px;}
     </style>
 """, unsafe_allow_html=True)
 
 # Helper function to capture modifications timestamps
 def get_file_info(folder, extension):
-    if not os.path.exists(folder): return None, "No historical data found"
+    if not os.path.exists(folder): return None, "No Data"
     files = glob.glob(f"{folder}/*{extension}")
-    if not files: return None, "No historical data found"
+    if not files: return None, "No Data"
     latest = max(files, key=os.path.getctime)
     mod_time = datetime.fromtimestamp(os.path.getctime(latest)).strftime('%Y-%m-%d %H:%M:%S')
     return latest, mod_time
@@ -106,7 +107,7 @@ _, bronze_ts = get_file_info('data/bronze', '.json')
 _, silver_ts = get_file_info('data/silver', '.parquet')
 
 # Try reading database to harvest gold lineage time stamp
-gold_ts = "No records synced"
+gold_ts = "No Data"
 try:
     conn = sqlite3.connect('data/crypto_warehouse.db')
     time_df = pd.read_sql("SELECT max(ingested_at) as mx FROM gold_crypto_prices", conn)
@@ -116,31 +117,48 @@ try:
 except Exception:
     pass
 
-# --- MODIFICATION 3: Dynamic flow diagram with real-time live timestamps inside boxes ---
+sys_time = st.session_state.last_refresh_time.split(' ')[1] if ' ' in st.session_state.last_refresh_time else 'Active'
+bronze_short = bronze_ts.split(' ')[1] if ' ' in bronze_ts else 'None'
+silver_short = silver_ts.split(' ')[1] if ' ' in silver_ts else 'None'
+gold_short = gold_ts.split(' ')[1] if ' ' in gold_ts else 'None'
+
+# --- RESTORED 6-STEP FLOW DIAGRAM WITH LIVE TIMESTAMPS ---
 flowchart_html = f"""
 <div class="flow-container">
     <div class="flow-box" style="border-color: #4caf50;">
         <div style="font-size:30px;">🌐</div>
-        <h4 style="color: #4caf50;">1. Ingestion</h4>
-        <div class="flow-details">• CoinCap API (Crypto)<br>• YFinance API (S&P500)<br><span class="timestamp-badge">🟢 Network Active</span></div>
+        <h4 style="color: #4caf50; font-size:14px; margin-bottom:0;">1. Ingestion</h4>
+        <div class="flow-details">• CoinCap (Crypto)<br>• YFinance (Macro)<br><span class="timestamp-badge">🟢 Ping: {sys_time}</span></div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box" style="border-color: #cd7f32;">
         <div style="font-size:30px;">🥉</div>
-        <h4 style="color: #cd7f32;">2. Bronze Lake</h4>
-        <div class="flow-details">• Pure Unaltered JSON<br>• Storage Backup Isolation<br><span class="timestamp-badge">📝 Saved: {bronze_ts.split(' ')[1] if ' ' in bronze_ts else 'None'}</span></div>
+        <h4 style="color: #cd7f32; font-size:14px; margin-bottom:0;">2. Bronze</h4>
+        <div class="flow-details">• Raw JSON<br>• Lineage Backup<br><span class="timestamp-badge">📝 Saved: {bronze_short}</span></div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box" style="border-color: #c0c0c0;">
         <div style="font-size:30px;">🥈</div>
-        <h4 style="color: #c0c0c0;">3. Silver Processing</h4>
-        <div class="flow-details">• Clean Schema Conversion<br>• PyArrow Optimized Parquet<br><span class="timestamp-badge">⚙️ Cast: {silver_ts.split(' ')[1] if ' ' in silver_ts else 'None'}</span></div>
+        <h4 style="color: #c0c0c0; font-size:14px; margin-bottom:0;">3. Silver</h4>
+        <div class="flow-details">• Clean Schema<br>• Col. Parquet<br><span class="timestamp-badge">⚙️ Cast: {silver_short}</span></div>
     </div>
     <div class="flow-arrow">➔</div>
     <div class="flow-box" style="border-color: #ffd700;">
         <div style="font-size:30px;">🥇</div>
-        <h4 style="color: #ffd700;">4. Gold Warehouse</h4>
-        <div class="flow-details">• SQLite Relational Mart<br>• Historical Time-Series Logs<br><span class="timestamp-badge">🗄️ Load: {gold_ts.split(' ')[1] if ' ' in gold_ts else 'None'}</span></div>
+        <h4 style="color: #ffd700; font-size:14px; margin-bottom:0;">4. Gold</h4>
+        <div class="flow-details">• Relational SQL<br>• Time-Series<br><span class="timestamp-badge">🗄️ Load: {gold_short}</span></div>
+    </div>
+    <div class="flow-arrow">➔</div>
+    <div class="flow-box" style="border-color: #9c27b0;">
+        <div style="font-size:30px;">📊</div>
+        <h4 style="color: #9c27b0; font-size:14px; margin-bottom:0;">5. Serving UI</h4>
+        <div class="flow-details">• Math Core<br>• Dual Charts<br><span class="timestamp-badge">🖥️ Sync: {sys_time}</span></div>
+    </div>
+    <div class="flow-arrow">➔</div>
+    <div class="flow-box" style="border-color: #00bcd4;">
+        <div style="font-size:30px;">🤖</div>
+        <h4 style="color: #00bcd4; font-size:14px; margin-bottom:0;">6. Predictive AI</h4>
+        <div class="flow-details">• Scikit-Learn ML<br>• Regression<br><span class="timestamp-badge">🧠 Train: {sys_time}</span></div>
     </div>
 </div>
 """
@@ -151,14 +169,14 @@ flowchart_html = f"""
 if not st.session_state.pipeline_executed:
     st.title("🚀 Enterprise Data Platform & Predictive Intelligence")
     st.markdown("<h4 style='color: #a0b4c7;'>Cross-Asset Macro Integration, Storage Optimization & Scikit-Learn Regression Forecasting</h4>", unsafe_allow_html=True)
+    
+    # 6-Step Flowchart is back!
     st.markdown(flowchart_html, unsafe_allow_html=True)
     
-    # Push element down to give prominence to the center button placement
-    st.write("### ")
     st.write("### ")
     
-    # MODIFICATION 1: Position Execute button at bottom center
-    col_l, col_center, col_r = st.columns([1.2, 2.0, 1.2])
+    # MODIFICATION 1: Execute Button centered at bottom
+    col_l, col_center, col_r = st.columns([1, 2, 1])
     with col_center:
         if st.button("▶ EXECUTE INTELLIGENCE PIPELINE", use_container_width=True):
             with st.spinner("Running Multi-Source ETL & Tuning ML Models..."):
@@ -170,7 +188,7 @@ if not st.session_state.pipeline_executed:
 # SCREEN 2: METRICS & ANALYTICS MART
 # ==========================================
 else:
-    # MODIFICATION 4: Dynamic Interactive Control Sidebar incorporating manual and automated refresh engines
+    # MODIFICATION 4: Refresh logic & Scheduled auto-refresh slider
     with st.sidebar:
         st.header("⚙️ Orchestration Control")
         
@@ -193,11 +211,10 @@ else:
             st.rerun()
 
         st.markdown("---")
-        # Visualizing the Warehouse metadata lineage logs
         conn = sqlite3.connect('data/crypto_warehouse.db')
         row_count = pd.read_sql("SELECT count(*) as count FROM gold_crypto_prices", conn)['count'].iloc[0]
         conn.close()
-        st.metric("Total Warehouse Warehouse Rows", row_count)
+        st.metric("Total Warehouse Rows", row_count)
         st.caption(f"Last Pipeline Sync Executed at:\n{st.session_state.last_refresh_time}")
 
     # Main Screen Content Load
@@ -208,7 +225,7 @@ else:
     latest_time = df['ingested_at'].max()
     latest_df = df[df['ingested_at'] == latest_time]
 
-    # MODIFICATION 2: Modified and styled tab text via high-visibility headers on top
+    # MODIFICATION 2: Massive Headers via Tab names
     tab1, tab2 = st.tabs(["🏗️ Pipeline Infrastructure State", "🧠 Advanced Analytics & ML Inference"])
 
     # --- TAB 1: THE DATA TRANSFORMATION STATE ---
@@ -218,13 +235,14 @@ else:
         b_size, s_size, savings = calculate_de_metrics()
         col_m1, col_m2, col_m3 = st.columns(3)
         with col_m1:
-            st.metric("Raw Bronze JSON Payload Size", f"{b_size} Bytes", help="Lineage benchmark stamp.")
+            st.metric("Raw Bronze JSON Size", f"{b_size} Bytes", help="Lineage benchmark stamp.")
         with col_m2:
-            st.metric("Compressed Silver Parquet Size", f"{s_size} Bytes", help="Columnar pyarrow array configuration.")
+            st.metric("Compressed Silver Parquet", f"{s_size} Bytes", help="Columnar pyarrow array configuration.")
         with col_m3:
             st.metric("Storage Optimization Ratio", f"{savings:.1f}% Savings", delta=f"{savings:.1f}% Compression Efficiency")
 
         st.markdown("---")
+        # MODIFICATION 3: Timestamps for Data Layers
         col_b, col_s, col_g = st.columns(3)
         with col_b:
             st.markdown(f"#### 🥉 Bronze Lake <br><span class='timestamp-badge'>File Update: {bronze_ts}</span>", unsafe_allow_html=True)
@@ -237,7 +255,7 @@ else:
             if silver_file:
                 st.dataframe(pd.read_parquet(silver_file), hide_index=True)
         with col_g:
-            st.markdown(f"#### 🥇 Gold Warehouse Table <br><span class='timestamp-badge'>DB Commit: {gold_ts}</span>", unsafe_allow_html=True)
+            st.markdown(f"#### 🥇 Gold Warehouse <br><span class='timestamp-badge'>DB Commit: {gold_ts}</span>", unsafe_allow_html=True)
             st.dataframe(latest_df[['symbol', 'priceUsd', 'ingested_at']], hide_index=True)
 
     # --- TAB 2: AI INSIGHTS, CORRELATION & MACHINE LEARNING ---
@@ -256,11 +274,11 @@ else:
             elif corr_value > 0.4:
                 correlation_msg = f"Strong Positive Correlation ({corr_value:.2f}). Crypto and Traditional Equities are climbing in tandem."
             elif corr_value < -0.4:
-                correlation_msg = f"Strong Negative Correlation ({corr_value:.2f}). Bitcoin acts as an direct inverse market hedge."
+                correlation_msg = f"Strong Negative Correlation ({corr_value:.2f}). Bitcoin acts as a direct inverse market hedge."
             else:
                 correlation_msg = f"Neutral Market Decoupling ({corr_value:.2f}). Crypto tokens are navigating independently of stock models."
 
-        # Scikit-Learn Local Machine Learning Operations Block
+        # Scikit-Learn ML
         ml_prediction_msg = "Awaiting sufficient database volume logs to configure model weights..."
         trend_signal = "NEUTRAL SYSTEM INERTIA"
         signal_color = "#FFA500" 
@@ -302,11 +320,10 @@ else:
         with col_c2:
             st.markdown("#### Macro Equity Benchmarks: S&P 500 Index (Points)")
             
-            # MODIFICATION 5: Fixed blank element by explicitly casting column to numeric frame, handling default single data coordinate smoothly
+            # MODIFICATION 5: Fixed S&P 500 Blank Bug
             if 'S&P500' in pivot_df.columns:
                 sp_chart_data = pivot_df[['S&P500']].apply(pd.to_numeric)
                 if len(sp_chart_data) == 1:
-                    # If there's only 1 row, st.line_chart renders completely empty. We fix this by displaying an aesthetic data table context
                     st.write("##### Baseline Timepoint Initialized:")
                     st.dataframe(sp_chart_data, use_container_width=True)
                 else:
@@ -324,12 +341,11 @@ else:
                 else:
                     st.metric(label=f"🪙 {row['symbol']} Asset", value=f"${float(row['priceUsd']):,.2f}")
 
-    # Push element down to give clean separation to the centered back button
     st.write("### ")
     st.markdown("---")
     
-    # MODIFICATION 1: Position back button at bottom center
-    col_l2, col_center2, col_r2 = st.columns([1.2, 2.0, 1.2])
+    # MODIFICATION 1: Back button centered at bottom, styled green
+    col_l2, col_center2, col_r2 = st.columns([1, 2, 1])
     with col_center2:
         if st.button("⬅️ BACK TO ARCHITECTURE BLUEPRINT", use_container_width=True):
             st.session_state.pipeline_executed = False
