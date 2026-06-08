@@ -1,46 +1,29 @@
 import pandas as pd
-import json
-import os
 import glob
+import os
 
 def transform_to_silver():
+    # Enforce directory creation
     os.makedirs('data/silver', exist_ok=True)
-    print("Starting Silver Layer Transformation...")
     
-    # 1. Find the newest file in the bronze folder automatically
-    list_of_files = glob.glob('data/bronze/*.json')
-    if not list_of_files:
-        print("Error: No Bronze files found to process.")
+    # Identify the latest raw extraction file
+    bronze_files = glob.glob('data/bronze/*.json')
+    if not bronze_files:
+        print("No Bronze data found to transform.")
         return
-        
-    latest_file = max(list_of_files, key=os.path.getctime)
-    print(f"Reading raw data from: {latest_file}")
+    latest_file = max(bronze_files, key=os.path.getctime)
     
-    # 2. Load the JSON data
-    with open(latest_file, 'r') as f:
-        raw_data = json.load(f)
-        
-    # 3. Extract the 'data' list from the JSON payload
-    crypto_list = raw_data['data']
+    # Read the raw multi-source JSON data
+    df = pd.read_json(latest_file)
     
-    # 4. Convert to a Pandas DataFrame
-    df = pd.DataFrame(crypto_list)
+    # Standardize and clean schemas across macro and crypto assets
+    df['priceUsd'] = pd.to_numeric(df['priceUsd'], errors='coerce')
+    df['marketCapUsd'] = pd.to_numeric(df['marketCapUsd'], errors='coerce')
     
-    # 5. The Silver Transformation Rules:
-    # A. Keep only the columns we actually need for business analytics
-    df = df[['id', 'symbol', 'rank', 'priceUsd', 'volumeUsd24Hr', 'marketCapUsd']]
+    # Clear invalid records
+    df = df.dropna(subset=['symbol'])
     
-    # B. The API gives us prices as Text (Strings). We must convert them to Floats (Decimals).
-    numeric_cols = ['priceUsd', 'volumeUsd24Hr', 'marketCapUsd']
-    for col in numeric_cols:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-        
-    # 6. Save as a highly-compressed Parquet file in the Silver folder
-    filename = os.path.basename(latest_file).replace('.json', '.parquet')
-    silver_path = f"data/silver/{filename}"
-    
-    df.to_parquet(silver_path, index=False)
-    print(f"Success! Clean data saved as Parquet to {silver_path}")
-
-if __name__ == "__main__":
-    transform_to_silver()
+    # Export to highly optimized columnar Parquet format
+    filename = os.path.basename(latest_file).replace('raw_', 'clean_').replace('.json', '.parquet')
+    df.to_parquet(f'data/silver/{filename}', engine='pyarrow', index=False)
+    print(f"Successfully transformed {filename} to Silver Layer.")
