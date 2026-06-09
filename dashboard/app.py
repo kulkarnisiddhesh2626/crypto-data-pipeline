@@ -61,12 +61,12 @@ st.markdown("""
     .signal-box { padding: 18px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; font-size: 16px; text-align: center; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); }
     .timestamp-badge { background-color: #263238; color: #4caf50 !important; font-family: monospace; padding: 4px 8px; border-radius: 2px; font-size: 11px; display: inline-block; border: 1px solid #4caf50; margin-top: 10px; }
     
-    /* FIXED: 6-Step Workflow Grid (Prevents Overlapping & Squeezing) */
+    /* 6-Step Workflow Grid (Fixed Layout) */
     .workflow-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        margin-top: 20px;
+        margin-top: 15px;
         margin-bottom: 30px;
     }
     .workflow-card {
@@ -101,7 +101,7 @@ st.markdown("""
         list-style-type: square;
     }
     
-    /* FIXED: About Project Styling (Large Font & Readable Width) */
+    /* About Project Styling (Large Font & Expandable Layout) */
     .about-box {
         background-color: #132235;
         border-left: 6px solid #4caf50;
@@ -112,7 +112,7 @@ st.markdown("""
     }
     .about-text {
         color: #f0f4f8;
-        font-size: 18px; /* Increased Font Size */
+        font-size: 18px; 
         line-height: 1.8;
     }
     .about-title {
@@ -167,7 +167,7 @@ col_viewport, col_controls = st.columns([3.0, 1.0])
 with col_controls:
     st.markdown("<br>", unsafe_allow_html=True) 
     
-    # 3 Identical Action Buttons
+    # Control Buttons
     if st.button("ABOUT PROJECT"):
         st.session_state.show_about = not st.session_state.show_about
         
@@ -193,7 +193,7 @@ with col_controls:
 with col_viewport:
     st.markdown("<h1 style='margin-top: 0px;'>DATA PIPELINE DASHBOARD</h1>", unsafe_allow_html=True)
     
-    # EXPANDABLE ABOUT SECTION (Rendered in wide column so the large text fits perfectly)
+    # 1. EXPANDABLE ABOUT SECTION (Stays at the top when toggled)
     if st.session_state.show_about:
         st.markdown("""
         <div class="about-box">
@@ -207,81 +207,85 @@ with col_viewport:
         </div>
         """, unsafe_allow_html=True)
     
-    if not st.session_state.pipeline_executed:
-        st.markdown("### ARCHITECTURE WORKFLOW")
-        st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The grid below outlines the 6 distinct steps of the data lifecycle. Click EXECUTE PIPELINE on the right to trigger this sequence.</p>", unsafe_allow_html=True)
-        
-        # FIXED: 3x2 Grid Layout for the 6 Steps
-        st.markdown(f"""
-        <div class="workflow-grid">
-            <div class="workflow-card" style="border-top-color: #4caf50;">
-                <div class="card-title">1. DATA INGESTION</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Source:</b> Network APIs</li>
-                        <li><b>Target:</b> Crypto and Equities</li>
-                        <li><b>Action:</b> Secure HTTP Requests</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="workflow-card" style="border-top-color: #cd7f32;">
-                <div class="card-title">2. BRONZE LAYER</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Format:</b> Raw JSON</li>
-                        <li><b>Storage:</b> Local Data Lake</li>
-                        <li><b>Purpose:</b> Immutable Backup</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="workflow-card" style="border-top-color: #c0c0c0;">
-                <div class="card-title">3. SILVER LAYER</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Format:</b> Columnar Parquet</li>
-                        <li><b>Process:</b> Schema Mapping</li>
-                        <li><b>Benefit:</b> High Compression</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="workflow-card" style="border-top-color: #ffd700;">
-                <div class="card-title">4. GOLD LAYER</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Format:</b> SQLite Database</li>
-                        <li><b>Schema:</b> Relational Tables</li>
-                        <li><b>Feature:</b> Time-Series Logs</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="workflow-card" style="border-top-color: #3a7bd5;">
-                <div class="card-title">5. SERVING UI</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Platform:</b> Streamlit</li>
-                        <li><b>Visuals:</b> Dual-Axis Charts</li>
-                        <li><b>Math:</b> Pearson Correlation</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="workflow-card" style="border-top-color: #9c27b0;">
-                <div class="card-title">6. PREDICTIVE ML</div>
-                <div class="card-points">
-                    <ul>
-                        <li><b>Engine:</b> Scikit-Learn</li>
-                        <li><b>Model:</b> Linear Regression</li>
-                        <li><b>Output:</b> Target Forecasts</li>
-                    </ul>
-                </div>
+    # 2. PERMANENT ARCHITECTURE WORKFLOW (Always visible here)
+    st.markdown("### ARCHITECTURE WORKFLOW")
+    st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The grid below outlines the 6 distinct steps of the enterprise data lifecycle.</p>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="workflow-grid">
+        <div class="workflow-card" style="border-top-color: #4caf50;">
+            <div class="card-title">1. DATA INGESTION</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Source:</b> Network APIs</li>
+                    <li><b>Target:</b> Crypto and Equities</li>
+                    <li><b>Action:</b> Secure HTTP Requests</li>
+                </ul>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        
+        <div class="workflow-card" style="border-top-color: #cd7f32;">
+            <div class="card-title">2. BRONZE LAYER</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Format:</b> Raw JSON</li>
+                    <li><b>Storage:</b> Local Data Lake</li>
+                    <li><b>Purpose:</b> Immutable Backup</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="workflow-card" style="border-top-color: #c0c0c0;">
+            <div class="card-title">3. SILVER LAYER</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Format:</b> Columnar Parquet</li>
+                    <li><b>Process:</b> Schema Mapping</li>
+                    <li><b>Benefit:</b> High Compression</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="workflow-card" style="border-top-color: #ffd700;">
+            <div class="card-title">4. GOLD LAYER</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Format:</b> SQLite Database</li>
+                    <li><b>Schema:</b> Relational Tables</li>
+                    <li><b>Feature:</b> Time-Series Logs</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="workflow-card" style="border-top-color: #3a7bd5;">
+            <div class="card-title">5. SERVING UI</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Platform:</b> Streamlit</li>
+                    <li><b>Visuals:</b> Dual-Axis Charts</li>
+                    <li><b>Math:</b> Pearson Correlation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="workflow-card" style="border-top-color: #9c27b0;">
+            <div class="card-title">6. PREDICTIVE ML</div>
+            <div class="card-points">
+                <ul>
+                    <li><b>Engine:</b> Scikit-Learn</li>
+                    <li><b>Model:</b> Linear Regression</li>
+                    <li><b>Output:</b> Target Forecasts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
+    st.markdown("---")
+
+    # 3. CONDITIONAL PIPELINE STATE CONTENT (Appears beneath the workflow)
+    if not st.session_state.pipeline_executed:
+        st.info("Pipeline State: Idle. Click 'EXECUTE PIPELINE' on the right panel to trigger calculations, run storage checks, and populate the analytics matrix.")
     else:
         # Load Operational Data
         conn = sqlite3.connect('data/crypto_warehouse.db')
