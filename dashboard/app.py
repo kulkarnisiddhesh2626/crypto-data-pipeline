@@ -151,7 +151,6 @@ col_viewport, col_controls = st.columns([3.0, 1.0])
 with col_controls:
     st.markdown("<br>", unsafe_allow_html=True) 
     
-    # 3 Identical Clean Action Buttons (No Symbols)
     if st.button("ABOUT PROJECT"):
         st.session_state.show_about = not st.session_state.show_about
         
@@ -177,103 +176,98 @@ with col_controls:
 with col_viewport:
     st.markdown("<h1 style='margin-top: 0px;'>DATA PIPELINE DASHBOARD</h1>", unsafe_allow_html=True)
     
-    # 1. EXPANDABLE ABOUT SECTION (Renders strictly inside a clean container)
+    # 1. EXPANDABLE ABOUT SECTION
     if st.session_state.show_about:
         st.markdown("""
-        <div class="about-container">
-            <div class="about-title">PROJECT OVERVIEW</div>
-            <div class="about-text">
-                This platform represents an enterprise Data Engineering Lakehouse Dashboard built over a structured Medallion Architecture. By triggering the pipeline, the system performs the following actions programmatically:
-                <ul>
-                    <li><b>Multi-Source Extraction:</b> Connects to live financial network APIs (Cryptocurrency and S&P 500 Equities).</li>
-                    <li><b>Data Lake Storage:</b> Creates immutable backups of raw JSON payloads directly to local disk.</li>
-                    <li><b>Transformation Engine:</b> Cleans, maps, and compresses data arrays into columnar Parquet files.</li>
-                    <li><b>Relational Warehouse:</b> Loads finalized schemas into a highly indexed SQL database for time-series querying.</li>
-                    <li><b>Machine Learning Core:</b> Fits mathematical regression models to the historical database arrays to forecast target prices.</li>
-                </ul>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class="about-container">
+<div class="about-title">PROJECT OVERVIEW</div>
+<div class="about-text">
+This platform represents an enterprise Data Engineering Lakehouse Dashboard built over a structured Medallion Architecture. By triggering the pipeline, the system performs the following actions programmatically:
+<ul>
+<li><b>Multi-Source Extraction:</b> Connects to live financial network APIs (Cryptocurrency and S&P 500 Equities).</li>
+<li><b>Data Lake Storage:</b> Creates immutable backups of raw JSON payloads directly to local disk.</li>
+<li><b>Transformation Engine:</b> Cleans, maps, and compresses data arrays into columnar Parquet files.</li>
+<li><b>Relational Warehouse:</b> Loads finalized schemas into a highly indexed SQL database for time-series querying.</li>
+<li><b>Machine Learning Core:</b> Fits mathematical regression models to the historical database arrays to forecast target prices.</li>
+</ul>
+</div>
+</div>
+""", unsafe_allow_html=True)
     
-    # 2. THE 6-STEP VERTICAL WORKFLOW DIAGRAM (Cannot be squeezed or broken)
+    # 2. THE 6-STEP VERTICAL WORKFLOW DIAGRAM (Made completely flush-left to fix rendering bugs)
     if not st.session_state.pipeline_executed:
         st.markdown("### ARCHITECTURE WORKFLOW")
         st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The blueprint below handles the end-to-end lineage map of our financial reporting network.</p>", unsafe_allow_html=True)
         
-        st.markdown(f"""
-        <div class="flow-container">
-            <div class="flow-box" style="border-left-color: #4caf50;">
-                <div class="flow-header">1. DATA INGESTION</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Connects via secure HTTP REST requests directly to the live CoinCap network API.</li>
-                        <li>Fetches the S&P 500 macro equity index from financial networks via Yahoo Finance.</li>
-                        <li>Implements strict fault tolerance and error boundaries to intercept network dropped states.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flow-arrow">&#8595;</div>
-            
-            <div class="flow-box" style="border-left-color: #cd7f32;">
-                <div class="flow-header">2. BRONZE LAYER</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Acts as an immutable local landing zone structure replicating a distributed Data Lake pattern.</li>
-                        <li>Saves the exact stringified raw JSON network response payload directly to the storage directory.</li>
-                        <li>Guarantees absolute data lineage capabilities and data recovery mechanisms if schemas shift downstream.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flow-arrow">&#8595;</div>
-            
-            <div class="flow-box" style="border-left-color: #c0c0c0;">
-                <div class="flow-header">3. SILVER LAYER</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Processes raw structures using Python Pandas analytics runtimes and PyArrow compilation engines.</li>
-                        <li>Standardizes missing dimensions, drops redundant keys, and explicitly casts alphanumeric strings to typed floats.</li>
-                        <li>Compresses localized metrics into binary columnar Parquet tables to optimize resource constraints.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flow-arrow">&#8595;</div>
-            
-            <div class="flow-box" style="border-left-color: #ffd700;">
-                <div class="flow-header">4. GOLD LAYER</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Maps refined tabular silver Parquet arrays directly into a relational SQLite database structure.</li>
-                        <li>Enforces an optimized schema with dedicated indexes for high-speed reporting queries.</li>
-                        <li>Appends structured database timestamp logs on insertion to allow continuous historical audit checks.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flow-arrow">&#8595;</div>
-            
-            <div class="flow-box" style="border-left-color: #3a7bd5;">
-                <div class="flow-header">5. SERVING UI</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Renders an interactive, responsive front-end layer via the Streamlit data application frame.</li>
-                        <li>Computes Pearson mathematical correlation tracking metrics dynamically between isolated asset categories.</li>
-                        <li>Displays structural data lineage stats, disk compression metrics, and dual-axis chart matrices.</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flow-arrow">&#8595;</div>
-            
-            <div class="flow-box" style="border-left-color: #9c27b0;">
-                <div class="flow-header">6. PREDICTIVE ML</div>
-                <div class="flow-content">
-                    <ul>
-                        <li>Calls Scikit-Learn analytical modules to establish a linear machine learning tracking layer.</li>
-                        <li>Queries structural gold warehouse logs to fit mathematical trendlines over complex price variations.</li>
-                        <li>Generates targeted asset valuation targets projecting figures forward to the subsequent runtime step.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("""
+<div class="flow-container">
+<div class="flow-box" style="border-left-color: #4caf50;">
+<div class="flow-header">1. DATA INGESTION</div>
+<div class="flow-content">
+<ul>
+<li>Connects via secure HTTP REST requests directly to the live CoinCap network API.</li>
+<li>Fetches the S&P 500 macro equity index from financial networks via Yahoo Finance.</li>
+<li>Implements strict fault tolerance and error boundaries to intercept network dropped states.</li>
+</ul>
+</div>
+</div>
+<div class="flow-arrow">&#8595;</div>
+<div class="flow-box" style="border-left-color: #cd7f32;">
+<div class="flow-header">2. BRONZE LAYER</div>
+<div class="flow-content">
+<ul>
+<li>Acts as an immutable local landing zone structure replicating a distributed Data Lake pattern.</li>
+<li>Saves the exact stringified raw JSON network response payload directly to the storage directory.</li>
+<li>Guarantees absolute data lineage capabilities and data recovery mechanisms if schemas shift downstream.</li>
+</ul>
+</div>
+</div>
+<div class="flow-arrow">&#8595;</div>
+<div class="flow-box" style="border-left-color: #c0c0c0;">
+<div class="flow-header">3. SILVER LAYER</div>
+<div class="flow-content">
+<ul>
+<li>Processes raw structures using Python Pandas analytics runtimes and PyArrow compilation engines.</li>
+<li>Standardizes missing dimensions, drops redundant keys, and explicitly casts alphanumeric strings to typed floats.</li>
+<li>Compresses localized metrics into binary columnar Parquet tables to optimize resource constraints.</li>
+</ul>
+</div>
+</div>
+<div class="flow-arrow">&#8595;</div>
+<div class="flow-box" style="border-left-color: #ffd700;">
+<div class="flow-header">4. GOLD LAYER</div>
+<div class="flow-content">
+<ul>
+<li>Maps refined tabular silver Parquet arrays directly into a relational SQLite database structure.</li>
+<li>Enforces an optimized schema with dedicated indexes for high-speed reporting queries.</li>
+<li>Appends structured database timestamp logs on insertion to allow continuous historical audit checks.</li>
+</ul>
+</div>
+</div>
+<div class="flow-arrow">&#8595;</div>
+<div class="flow-box" style="border-left-color: #3a7bd5;">
+<div class="flow-header">5. SERVING UI</div>
+<div class="flow-content">
+<ul>
+<li>Renders an interactive, responsive front-end layer via the Streamlit data application frame.</li>
+<li>Computes Pearson mathematical correlation tracking metrics dynamically between isolated asset categories.</li>
+<li>Displays structural data lineage stats, disk compression metrics, and dual-axis chart matrices.</li>
+</ul>
+</div>
+</div>
+<div class="flow-arrow">&#8595;</div>
+<div class="flow-box" style="border-left-color: #9c27b0;">
+<div class="flow-header">6. PREDICTIVE ML</div>
+<div class="flow-content">
+<ul>
+<li>Calls Scikit-Learn analytical modules to establish a linear machine learning tracking layer.</li>
+<li>Queries structural gold warehouse logs to fit mathematical trendlines over complex price variations.</li>
+<li>Generates targeted asset valuation targets projecting figures forward to the subsequent runtime step.</li>
+</ul>
+</div>
+</div>
+</div>
+""", unsafe_allow_html=True)
 
     # 3. CONDITIONAL PIPELINE METRICS (Appears when executed)
     else:
@@ -288,7 +282,7 @@ with col_viewport:
 
         # --- TAB 1: DATA LINEAGE ---
         with tab1:
-            st.markdown(f"### FILE COMPRESSION METRICS", unsafe_allow_html=True)
+            st.markdown("### FILE COMPRESSION METRICS", unsafe_allow_html=True)
             st.markdown(f"<span class='timestamp-badge'>LAST PIPELINE EXECUTION: {st.session_state.last_refresh_time}</span>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
             
@@ -301,16 +295,16 @@ with col_viewport:
             st.markdown("---")
             col_b, col_s, col_g = st.columns(3)
             with col_b:
-                st.markdown(f"#### BRONZE DATA (RAW JSON)", unsafe_allow_html=True)
+                st.markdown("#### BRONZE DATA (RAW JSON)", unsafe_allow_html=True)
                 bronze_file, _ = get_file_info('data/bronze', '.json')
                 if bronze_file:
                     with open(bronze_file, 'r') as f: st.json(json.load(f))
             with col_s:
-                st.markdown(f"#### SILVER DATA (PARQUET)", unsafe_allow_html=True)
+                st.markdown("#### SILVER DATA (PARQUET)", unsafe_allow_html=True)
                 silver_file, _ = get_file_info('data/silver', '.parquet')
                 if silver_file: st.dataframe(pd.read_parquet(silver_file), hide_index=True)
             with col_g:
-                st.markdown(f"#### GOLD DATA (DATABASE)", unsafe_allow_html=True)
+                st.markdown("#### GOLD DATA (DATABASE)", unsafe_allow_html=True)
                 st.dataframe(latest_df[['symbol', 'priceUsd', 'ingested_at']], hide_index=True)
 
         # --- TAB 2: ANALYTICS & AI ---
