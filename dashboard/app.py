@@ -24,8 +24,8 @@ if 'pipeline_executed' not in st.session_state:
     st.session_state.pipeline_executed = False
 if 'last_refresh_time' not in st.session_state:
     st.session_state.last_refresh_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-if 'right_panel_view' not in st.session_state:
-    st.session_state.right_panel_view = "about" 
+if 'show_about_project' not in st.session_state:
+    st.session_state.show_about_project = True # Defaults to expanded
 
 # --- SYSTEM STYLING & CUSTOM USER INTERFACE TUNING ---
 st.markdown("""
@@ -63,19 +63,25 @@ st.markdown("""
     /* Horizontal Flowchart Diagram Styling */
     .pipeline-flow { 
         display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: stretch; 
-        gap: 15px; background-color: #132235; padding: 30px; border-radius: 8px; border: 1px solid #1e3a5f; margin-top: 15px;
+        gap: 12px; background-color: #132235; padding: 25px; border-radius: 8px; border: 1px solid #1e3a5f; margin-top: 15px;
     }
     .pipeline-step { 
-        background-color: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 6px; padding: 20px; 
-        flex: 1; min-width: 200px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+        background-color: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 6px; padding: 15px; 
+        flex: 1; min-width: 150px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
     }
-    .step-title { font-size: 15px; font-weight: bold; color: #ffffff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;}
-    .step-desc { font-size: 13px; color: #a0b4c7; line-height: 1.6; }
-    .step-arrow { color: #3a7bd5; font-size: 30px; font-weight: bold; align-self: center; }
+    .step-title { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;}
+    .step-desc { font-size: 12px; color: #a0b4c7; line-height: 1.5; }
+    .step-desc ul { padding-left: 15px; margin-top: 5px; margin-bottom: 0px; }
+    .step-desc li { margin-bottom: 6px; list-style-type: square; }
+    .step-arrow { color: #3a7bd5; font-size: 24px; font-weight: bold; align-self: center; }
     
-    /* About Project Styling - INCREASED FONT SIZES */
-    .blueprint-header { color: #4caf50 !important; font-size: 18px; font-weight: bold; margin-top: 24px; border-bottom: 2px solid rgba(255,255,255,0.15); padding-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    /* About Project Expandable Styling - LARGE FONT */
+    .blueprint-container { background-color: #132235; border: 1px solid #1e3a5f; border-radius: 8px; padding: 20px; margin-top: 10px; }
+    .blueprint-header { color: #4caf50 !important; font-size: 18px; font-weight: bold; margin-top: 20px; border-bottom: 2px solid rgba(255,255,255,0.15); padding-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    .blueprint-header:first-of-type { margin-top: 0px; }
     .blueprint-text { color: #a0b4c7 !important; font-size: 16px; line-height: 1.8; }
+    .blueprint-text ul { padding-left: 20px; margin-top: 10px; }
+    .blueprint-text li { margin-bottom: 8px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -121,9 +127,9 @@ col_viewport, col_controls = st.columns([3.0, 1.0])
 with col_controls:
     st.markdown("<br>", unsafe_allow_html=True) 
     
-    # CONTROL BUTTONS
+    # Expandable ABOUT PROJECT Toggle Button
     if st.button("ABOUT PROJECT"):
-        st.session_state.right_panel_view = "about"
+        st.session_state.show_about_project = not st.session_state.show_about_project
         
     if not st.session_state.pipeline_executed:
         if st.button("EXECUTE PIPELINE"):
@@ -138,28 +144,55 @@ with col_controls:
             
     st.markdown("---")
 
-    # DYNAMIC CONTENT VIEWER (PROJECT DETAILS WITH LARGE TEXT)
-    if st.session_state.right_panel_view == "about":
-        st.markdown("### PROJECT DETAILS")
-        
-        st.markdown(f"""
-        <div class="blueprint-text">
-        This platform represents a complete Data Engineering Lakehouse Pipeline, processing raw network streams into machine learning forecasts.
-        
-        <div class="blueprint-header">DATA INGESTION</div>
-        Connects via HTTP REST requests to the CoinCap API for cryptocurrency arrays and the Yahoo Finance API for the S&P 500 macro equity index. Implements strict try/except fault tolerance to handle network drops.
-        
-        <div class="blueprint-header">BRONZE LAYER (LAKE)</div>
-        An immutable local storage zone. Saves the exact JSON payload from the APIs directly to disk. This guarantees absolute data lineage and allows the pipeline to be rebuilt identically if downstream errors occur.
-        
-        <div class="blueprint-header">SILVER LAYER (CLEAN)</div>
-        Powered by Python Pandas and PyArrow. It extracts the Bronze JSON, standardizes the schema, casts text fields into numeric floats, and compresses the output into columnar Parquet files to maximize disk efficiency.
-        
-        <div class="blueprint-header">GOLD LAYER (DATABASE)</div>
-        Maps the refined Parquet data into an SQLite relational database. It enforces a structured table schema and automatically appends execution timestamps for historical time-series tracking.
-        
-        <div class="blueprint-header">MACHINE LEARNING</div>
-        Executes a Scikit-Learn Linear Regression model. It reads the Gold database history, plots the price trajectory matrix, and calculates the target numerical value vector for the next pipeline execution.
+    # EXPANDABLE PROJECT DETAILS CONTENT
+    if st.session_state.show_about_project:
+        st.markdown("""
+        <div class="blueprint-container">
+            <div class="blueprint-text">
+            
+            <div class="blueprint-header">1. DATA INGESTION</div>
+            <ul>
+                <li>Connects via HTTP REST requests to the CoinCap API.</li>
+                <li>Fetches the S&P 500 macro equity index via Yahoo Finance.</li>
+                <li>Implements strict try/except fault tolerance to handle network drops.</li>
+            </ul>
+            
+            <div class="blueprint-header">2. BRONZE LAYER</div>
+            <ul>
+                <li>Immutable local storage zone acting as a Data Lake.</li>
+                <li>Saves the exact JSON payload from APIs directly to disk.</li>
+                <li>Guarantees absolute data lineage and recovery capabilities.</li>
+            </ul>
+            
+            <div class="blueprint-header">3. SILVER LAYER</div>
+            <ul>
+                <li>Powered by Python Pandas and PyArrow engines.</li>
+                <li>Standardizes schemas and casts text to numeric floats.</li>
+                <li>Compresses output into columnar Parquet files for efficiency.</li>
+            </ul>
+            
+            <div class="blueprint-header">4. GOLD LAYER</div>
+            <ul>
+                <li>Maps refined Parquet data into a relational SQLite database.</li>
+                <li>Enforces a strictly structured SQL table schema.</li>
+                <li>Appends execution timestamps for time-series tracking.</li>
+            </ul>
+            
+            <div class="blueprint-header">5. SERVING UI</div>
+            <ul>
+                <li>Interactive Streamlit dashboard interface.</li>
+                <li>Computes Pearson correlation matrices across asset classes.</li>
+                <li>Displays live data lineage, storage metrics, and dynamic charts.</li>
+            </ul>
+            
+            <div class="blueprint-header">6. PREDICTIVE ML</div>
+            <ul>
+                <li>Executes a Scikit-Learn Linear Regression model.</li>
+                <li>Reads Gold database history to plot price trajectory matrices.</li>
+                <li>Forecasts target numerical values for the next pipeline execution.</li>
+            </ul>
+            
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -172,48 +205,79 @@ with col_viewport:
     
     if not st.session_state.pipeline_executed:
         st.markdown("### ARCHITECTURE WORKFLOW")
-        st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The diagram below outlines the highly structured journey of our data. Information is pulled from external financial networks, heavily processed and optimized through the Medallion Data architecture, and utilized to generate localized Machine Learning inferences. Click Execute Pipeline on the right to trigger this sequence.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The diagram below outlines the 6-step lifecycle of our data. Information is pulled from external financial networks, processed through the Medallion Data architecture, and utilized to generate localized Machine Learning inferences. Click Execute Pipeline on the right to trigger this sequence.</p>", unsafe_allow_html=True)
         
-        # ENHANCED, EXPANDED HORIZONTAL FLOWCHART
+        # 6-STEP EXPANDED HORIZONTAL FLOWCHART WITH BULLET POINTS
         st.markdown(f"""
         <div class="pipeline-flow">
             <div class="pipeline-step" style="border-top-color: #4caf50;">
-                <div class="step-title">1. EXTRACT DATA</div>
+                <div class="step-title">1. INGESTION</div>
                 <div class="step-desc">
-                    <strong>Source:</strong> External Network APIs<br><br>
-                    <strong>Process:</strong> Initiates secure HTTP connections to fetch live cryptocurrency arrays and macroeconomic indices. Implements robust error handling protocols to ensure uninterrupted ingestion during API rate limits.
+                    <ul>
+                        <li><b>Source:</b> Network APIs</li>
+                        <li><b>Target:</b> Crypto & Equities</li>
+                        <li><b>Process:</b> Secure HTTP REST</li>
+                    </ul>
                 </div>
             </div>
-            <div class="step-arrow">➔</div>
+            <div class="step-arrow">>></div>
+            
             <div class="pipeline-step" style="border-top-color: #cd7f32;">
                 <div class="step-title">2. BRONZE LAYER</div>
                 <div class="step-desc">
-                    <strong>Format:</strong> Raw JSON Payload<br><br>
-                    <strong>Process:</strong> Serves as the immutable local Data Lake. Captures and writes the unaltered payload directly to disk. This provides absolute data lineage and a fault-tolerant backup for disaster recovery.
+                    <ul>
+                        <li><b>Format:</b> Raw JSON</li>
+                        <li><b>Storage:</b> Local Data Lake</li>
+                        <li><b>Purpose:</b> Immutable Backup</li>
+                    </ul>
                 </div>
             </div>
-            <div class="step-arrow">➔</div>
+            <div class="step-arrow">>></div>
+            
             <div class="pipeline-step" style="border-top-color: #c0c0c0;">
                 <div class="step-title">3. SILVER LAYER</div>
                 <div class="step-desc">
-                    <strong>Format:</strong> Columnar Parquet<br><br>
-                    <strong>Process:</strong> The cleansing engine. Ingests raw JSON, enforces strict data typing using Pandas, drops null values, and serializes the output via PyArrow. Achieves significant storage compression and rapid read speeds.
+                    <ul>
+                        <li><b>Format:</b> Columnar Parquet</li>
+                        <li><b>Process:</b> Type Casting</li>
+                        <li><b>Result:</b> High Compression</li>
+                    </ul>
                 </div>
             </div>
-            <div class="step-arrow">➔</div>
+            <div class="step-arrow">>></div>
+            
             <div class="pipeline-step" style="border-top-color: #ffd700;">
                 <div class="step-title">4. GOLD LAYER</div>
                 <div class="step-desc">
-                    <strong>Format:</strong> Relational SQLite<br><br>
-                    <strong>Process:</strong> The analytical Data Warehouse. Maps the refined Parquet tables into a rigid SQL schema. Generates and appends execution timestamps to every record, enabling complex historical time-series queries.
+                    <ul>
+                        <li><b>Format:</b> SQLite Database</li>
+                        <li><b>Schema:</b> Relational Tables</li>
+                        <li><b>Feature:</b> Time-Series Logs</li>
+                    </ul>
                 </div>
             </div>
-            <div class="step-arrow">➔</div>
-            <div class="pipeline-step" style="border-top-color: #9c27b0;">
-                <div class="step-title">5. ANALYTICS & ML</div>
+            <div class="step-arrow">>></div>
+            
+            <div class="pipeline-step" style="border-top-color: #3a7bd5;">
+                <div class="step-title">5. SERVING UI</div>
                 <div class="step-desc">
-                    <strong>Format:</strong> Streamlit & Scikit-Learn<br><br>
-                    <strong>Process:</strong> The presentation tier. Computes Pearson correlation matrices across asset classes and trains a local Linear Regression model on the SQL data to forecast predictive market trajectories.
+                    <ul>
+                        <li><b>Platform:</b> Streamlit</li>
+                        <li><b>Feature:</b> Dual-Axis Charts</li>
+                        <li><b>Math:</b> Pearson Correlation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="step-arrow">>></div>
+            
+            <div class="pipeline-step" style="border-top-color: #9c27b0;">
+                <div class="step-title">6. PREDICTIVE ML</div>
+                <div class="step-desc">
+                    <ul>
+                        <li><b>Engine:</b> Scikit-Learn</li>
+                        <li><b>Model:</b> Linear Regression</li>
+                        <li><b>Output:</b> Target Forecasts</li>
+                    </ul>
                 </div>
             </div>
         </div>
