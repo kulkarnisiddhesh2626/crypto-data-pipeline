@@ -45,7 +45,7 @@ st.markdown("""
         width: 100% !important;
         height: 60px !important;
         transition: 0.3s;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
@@ -53,30 +53,29 @@ st.markdown("""
     
     /* Viewport UI Adjustments */
     button[data-baseweb="tab"] { height: 60px !important; }
-    button[data-baseweb="tab"] p { font-size: 20px !important; font-weight: bold !important; color: #a0b4c7 !important; letter-spacing: 1px; }
+    button[data-baseweb="tab"] p { font-size: 18px !important; font-weight: bold !important; color: #a0b4c7 !important; letter-spacing: 1px; }
     button[data-baseweb="tab"][aria-selected="true"] p { color: #4caf50 !important; border-bottom: 3px solid #4caf50; }
-    
-    /* Main Flowchart Styling */
-    .flow-container { display: flex; flex-direction: column; gap: 12px; background-color: #132235; padding: 20px; border-radius: 8px; border: 1px solid #1e3a5f; }
-    .flow-box { display: flex; align-items: center; background: #1a2a40; border-left: 6px solid #3a7bd5; border-radius: 4px; padding: 15px 20px; gap: 15px; }
-    .flow-title { font-size: 16px; font-weight: bold; color: #f0f4f8; margin-bottom: 4px; }
-    .flow-subtitle { font-size: 12px; color: #a0b4c7; }
-    .flow-details { text-align: right; font-size: 12px; color: #a0b4c7; margin-left: auto; line-height: 1.4; }
     
     [data-testid="stMetric"] { background-color: #1a2a40; border-left: 5px solid #4caf50; padding: 15px; border-radius: 4px; }
     .signal-box { padding: 18px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; font-size: 16px; text-align: center; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); }
-    .timestamp-badge { background-color: #263238; color: #4caf50 !important; font-family: monospace; padding: 4px 8px; border-radius: 2px; font-size: 11px; display: inline-block; border: 1px solid #4caf50; }
+    .timestamp-badge { background-color: #263238; color: #4caf50 !important; font-family: monospace; padding: 4px 8px; border-radius: 2px; font-size: 11px; display: inline-block; border: 1px solid #4caf50; margin-top: 10px; }
     
-    /* Diagram Blueprint Styling */
-    .diagram-card {
-        background-color: #1a2a40; border: 1px solid #3a7bd5; border-radius: 6px; padding: 15px; margin-bottom: 15px;
-        position: relative;
+    /* Horizontal Flowchart Diagram Styling */
+    .pipeline-flow { 
+        display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: stretch; 
+        gap: 15px; background-color: #132235; padding: 30px; border-radius: 8px; border: 1px solid #1e3a5f; margin-top: 15px;
     }
-    .diagram-arrow {
-        text-align: center; color: #3a7bd5; font-size: 24px; font-weight: bold; margin: -5px 0 10px 0;
+    .pipeline-step { 
+        background-color: #1a2a40; border-top: 5px solid #3a7bd5; border-radius: 6px; padding: 20px; 
+        width: 17%; min-width: 180px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
     }
-    .diagram-header { color: #4caf50; font-size: 15px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;}
-    .diagram-text { color: #a0b4c7; font-size: 13px; line-height: 1.5; }
+    .step-title { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .step-desc { font-size: 12px; color: #a0b4c7; line-height: 1.6; }
+    .step-arrow { color: #3a7bd5; font-size: 30px; font-weight: bold; align-self: center; }
+    
+    /* About Project Styling */
+    .blueprint-header { color: #4caf50 !important; font-size: 14px; font-weight: bold; margin-top: 20px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+    .blueprint-text { color: #a0b4c7 !important; font-size: 13px; line-height: 1.6; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -109,22 +108,12 @@ def execute_pipeline():
 # --- POLLING TIMESTAMPS ---
 _, bronze_ts = get_file_info('data/bronze', '.json')
 _, silver_ts = get_file_info('data/silver', '.parquet')
-gold_ts = "NO DATA"
-try:
-    conn = sqlite3.connect('data/crypto_warehouse.db')
-    time_df = pd.read_sql("SELECT max(ingested_at) as mx FROM gold_crypto_prices", conn)
-    if not time_df.empty and time_df['mx'].iloc[0]: gold_ts = time_df['mx'].iloc[0]
-    conn.close()
-except Exception: pass
-sys_time = st.session_state.last_refresh_time.split(' ')[1] if ' ' in st.session_state.last_refresh_time else 'READY'
-bronze_short = bronze_ts.split(' ')[1] if ' ' in bronze_ts else 'WAITING'
-silver_short = silver_ts.split(' ')[1] if ' ' in silver_ts else 'WAITING'
-gold_short = gold_ts.split(' ')[1] if ' ' in gold_ts else 'WAITING'
+sys_time = st.session_state.last_refresh_time
 
 # ==============================================================================
 # MAIN LAYOUT
 # ==============================================================================
-col_viewport, col_controls = st.columns([2.8, 1.2])
+col_viewport, col_controls = st.columns([3.0, 1.0])
 
 # ------------------------------------------------------------------------------
 # RIGHT PANEL: CONTROL CENTER
@@ -143,44 +132,34 @@ with col_controls:
                 execute_pipeline()
             st.rerun()
     else:
-        if st.button("BACK TO HOME"):
+        if st.button("BACK TO OVERVIEW"):
             st.session_state.pipeline_executed = False
             st.rerun()
             
     st.markdown("---")
 
-    # DYNAMIC CONTENT VIEWER (DIAGRAM BLUEPRINT)
+    # DYNAMIC CONTENT VIEWER (PROJECT DETAILS)
     if st.session_state.right_panel_view == "about":
-        st.markdown("### HOW THIS WORKS")
+        st.markdown("### PROJECT DETAILS")
         
         st.markdown(f"""
-        <div class="diagram-card" style="border-left: 5px solid #4caf50;">
-            <div class="diagram-header">1. Extract (APIs)</div>
-            <div class="diagram-text">Downloads live Crypto prices (CoinCap) and the Stock Market Index (Yahoo Finance).</div>
-        </div>
-        <div class="diagram-arrow">↓</div>
+        <div class="blueprint-text">
+        This platform represents a complete Data Engineering Lakehouse Pipeline, processing raw network streams into machine learning forecasts.
         
-        <div class="diagram-card" style="border-left: 5px solid #cd7f32;">
-            <div class="diagram-header">2. Bronze Layer (Raw Storage)</div>
-            <div class="diagram-text">Saves the raw JSON data directly to a folder. This is a secure backup that acts as our "Data Lake".</div>
-        </div>
-        <div class="diagram-arrow">↓</div>
+        <div class="blueprint-header">DATA INGESTION</div>
+        Connects via HTTP REST requests to the CoinCap API for cryptocurrency arrays and the Yahoo Finance API for the S&P 500 macro equity index. Implements strict try/except fault tolerance.
         
-        <div class="diagram-card" style="border-left: 5px solid #c0c0c0;">
-            <div class="diagram-header">3. Silver Layer (Clean Data)</div>
-            <div class="diagram-text">Uses Python Pandas to clean the text, remove empty fields, and compress the file into Parquet format to save space.</div>
-        </div>
-        <div class="diagram-arrow">↓</div>
+        <div class="blueprint-header">BRONZE LAYER (LAKE)</div>
+        An immutable local storage zone. Saves the exact JSON payload from the APIs to disk. This guarantees absolute data lineage and allows the pipeline to be rebuilt if downstream errors occur.
         
-        <div class="diagram-card" style="border-left: 5px solid #ffd700;">
-            <div class="diagram-header">4. Gold Layer (Database)</div>
-            <div class="diagram-text">Loads the clean data into an SQLite Database and adds a timestamp so we can track price changes over time.</div>
-        </div>
-        <div class="diagram-arrow">↓</div>
+        <div class="blueprint-header">SILVER LAYER (CLEAN)</div>
+        Powered by Python Pandas and PyArrow. It extracts the Bronze JSON, standardizes the schema, casts text fields into numeric floats, and compresses the output into columnar Parquet files to save disk space.
         
-        <div class="diagram-card" style="border-left: 5px solid #9c27b0;">
-            <div class="diagram-header">5. Analytics & Predictions</div>
-            <div class="diagram-text">Displays the data on this dashboard and uses a Machine Learning model to predict where the price might go next.</div>
+        <div class="blueprint-header">GOLD LAYER (DATABASE)</div>
+        Maps the refined Parquet data into an SQLite relational database. It enforces a structured table schema and automatically appends execution timestamps for historical tracking.
+        
+        <div class="blueprint-header">MACHINE LEARNING</div>
+        Executes a Scikit-Learn Linear Regression model. It reads the Gold database history, plots the price trajectory matrix, and predicts the target numerical value for the next pipeline execution.
         </div>
         """, unsafe_allow_html=True)
 
@@ -192,45 +171,35 @@ with col_viewport:
     st.markdown("<h1 style='margin-top: 0px;'>DATA PIPELINE DASHBOARD</h1>", unsafe_allow_html=True)
     
     if not st.session_state.pipeline_executed:
-        st.markdown("### ARCHITECTURE OVERVIEW")
-        st.markdown("<p style='color: #a0b4c7; font-size: 15px;'>This diagram shows the step-by-step journey of our data. Click 'Execute Pipeline' to run the code and see the live results.</p>", unsafe_allow_html=True)
+        st.markdown("### ARCHITECTURE WORKFLOW")
+        st.markdown("<p style='color: #a0b4c7; font-size: 15px;'>The diagram below illustrates the complete end-to-end data lifecycle. Data moves from external network APIs through structured storage layers, ultimately arriving at the analytics and predictive engine. Click Execute Pipeline on the right to trigger this sequence.</p>", unsafe_allow_html=True)
         
+        # COMPLETE, DETAILED HORIZONTAL FLOWCHART
         st.markdown(f"""
-        <div class="flow-container">
-            <div class="flow-box">
-                <div>
-                    <div class="flow-title">1. Fetch Live Data</div>
-                    <div class="flow-subtitle">Downloads Crypto & Stock Market Prices</div>
-                </div>
-                <div class="flow-details"><span class="timestamp-badge">STATUS: {sys_time}</span></div>
+        <div class="pipeline-flow">
+            <div class="pipeline-step" style="border-top-color: #4caf50;">
+                <div class="step-title">1. EXTRACT DATA</div>
+                <div class="step-desc">Downloads live Crypto pricing and Stock Market indices via network APIs. Includes error handling to ensure continuous uptime.</div>
             </div>
-            <div class="flow-box">
-                <div>
-                    <div class="flow-title">2. Save Raw Backup (Bronze Layer)</div>
-                    <div class="flow-subtitle">Stores exact copies of downloaded files</div>
-                </div>
-                <div class="flow-details"><span class="timestamp-badge">SAVED: {bronze_short}</span></div>
+            <div class="step-arrow">➔</div>
+            <div class="pipeline-step" style="border-top-color: #cd7f32;">
+                <div class="step-title">2. BRONZE LAYER</div>
+                <div class="step-desc">Saves the exact raw JSON files directly to a local Data Lake. This preserves a complete historical backup with zero data loss.</div>
             </div>
-            <div class="flow-box">
-                <div>
-                    <div class="flow-title">3. Clean & Compress (Silver Layer)</div>
-                    <div class="flow-subtitle">Formats text to numbers and compresses file size</div>
-                </div>
-                <div class="flow-details"><span class="timestamp-badge">CLEANED: {silver_short}</span></div>
+            <div class="step-arrow">➔</div>
+            <div class="pipeline-step" style="border-top-color: #c0c0c0;">
+                <div class="step-title">3. SILVER LAYER</div>
+                <div class="step-desc">Cleans structural errors, formats text to numbers, and compresses the data into a highly optimized columnar Parquet format.</div>
             </div>
-            <div class="flow-box">
-                <div>
-                    <div class="flow-title">4. Load into Database (Gold Layer)</div>
-                    <div class="flow-subtitle">Saves to a database for easy reading</div>
-                </div>
-                <div class="flow-details"><span class="timestamp-badge">LOADED: {gold_short}</span></div>
+            <div class="step-arrow">➔</div>
+            <div class="pipeline-step" style="border-top-color: #ffd700;">
+                <div class="step-title">4. GOLD LAYER</div>
+                <div class="step-desc">Loads the finalized data into a relational SQLite database. Appends strict timestamps to enable time-series SQL analytics.</div>
             </div>
-            <div class="flow-box">
-                <div>
-                    <div class="flow-title">5. Show Dashboard & Predict Prices</div>
-                    <div class="flow-subtitle">Builds charts and runs a forecasting model</div>
-                </div>
-                <div class="flow-details"><span class="timestamp-badge">DONE: {sys_time}</span></div>
+            <div class="step-arrow">➔</div>
+            <div class="pipeline-step" style="border-top-color: #9c27b0;">
+                <div class="step-title">5. ANALYTICS & ML</div>
+                <div class="step-desc">Queries the database to generate live visual charts and runs a Machine Learning regression model to forecast future prices.</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -243,50 +212,52 @@ with col_viewport:
         latest_time = df['ingested_at'].max()
         latest_df = df[df['ingested_at'] == latest_time]
 
-        tab1, tab2 = st.tabs(["DATA FILES (ETL STATE)", "CHARTS & PREDICTIONS"])
+        tab1, tab2 = st.tabs(["PIPELINE STORAGE STATE", "MARKET TRENDS AND PREDICTIONS"])
 
         # --- TAB 1: DATA LINEAGE ---
         with tab1:
-            st.markdown(f"### FILE SIZES <span style='font-size:14px;' class='timestamp-badge'>LAST RUN: {st.session_state.last_refresh_time}</span>", unsafe_allow_html=True)
+            st.markdown(f"### FILE COMPRESSION METRICS", unsafe_allow_html=True)
+            st.markdown(f"<span class='timestamp-badge'>LAST PIPELINE EXECUTION: {st.session_state.last_refresh_time}</span>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             
             b_size, s_size, savings = calculate_de_metrics()
             col_m1, col_m2, col_m3 = st.columns(3)
-            with col_m1: st.metric("Raw Bronze File Size", f"{b_size} Bytes")
-            with col_m2: st.metric("Clean Silver File Size", f"{s_size} Bytes")
-            with col_m3: st.metric("Storage Space Saved", f"{savings:.1f}%")
+            with col_m1: st.metric("RAW BRONZE FILE SIZE", f"{b_size} Bytes")
+            with col_m2: st.metric("CLEAN SILVER FILE SIZE", f"{s_size} Bytes")
+            with col_m3: st.metric("STORAGE SPACE SAVED", f"{savings:.1f}%")
 
             st.markdown("---")
             col_b, col_s, col_g = st.columns(3)
             with col_b:
-                st.markdown(f"#### BRONZE DATA (Raw)", unsafe_allow_html=True)
+                st.markdown(f"#### BRONZE DATA (RAW JSON)", unsafe_allow_html=True)
                 bronze_file, _ = get_file_info('data/bronze', '.json')
                 if bronze_file:
                     with open(bronze_file, 'r') as f: st.json(json.load(f))
             with col_s:
-                st.markdown(f"#### SILVER DATA (Clean)", unsafe_allow_html=True)
+                st.markdown(f"#### SILVER DATA (PARQUET)", unsafe_allow_html=True)
                 silver_file, _ = get_file_info('data/silver', '.parquet')
                 if silver_file: st.dataframe(pd.read_parquet(silver_file), hide_index=True)
             with col_g:
-                st.markdown(f"#### GOLD DATA (Database)", unsafe_allow_html=True)
+                st.markdown(f"#### GOLD DATA (DATABASE)", unsafe_allow_html=True)
                 st.dataframe(latest_df[['symbol', 'priceUsd', 'ingested_at']], hide_index=True)
 
         # --- TAB 2: ANALYTICS & AI ---
         with tab2:
-            st.markdown("### MARKET TRENDS AND PREDICTIONS")
+            st.markdown("### MACHINE LEARNING FORECAST")
             
             clean_df = df.drop_duplicates(subset=['ingested_at', 'symbol'])
             pivot_df = clean_df.pivot(index='ingested_at', columns='symbol', values='priceUsd')
             
-            correlation_msg = "Waiting for more data to find a trend..."
+            correlation_msg = "Waiting for additional historical data to calculate trends."
             if 'BTC' in pivot_df.columns and 'S&P500' in pivot_df.columns and len(pivot_df) > 1:
                 corr_value = pivot_df['BTC'].corr(pivot_df['S&P500'])
-                if pd.isna(corr_value): correlation_msg = "Need more price changes. Run the pipeline again."
-                elif corr_value > 0.4: correlation_msg = "Positive Trend: Crypto and Stock Market are moving up together."
-                elif corr_value < -0.4: correlation_msg = "Negative Trend: Crypto is moving opposite to the Stock Market."
-                else: correlation_msg = "Neutral: Crypto and Stocks are moving independently."
+                if pd.isna(corr_value): correlation_msg = "Need more price variance. Execute the pipeline again."
+                elif corr_value > 0.4: correlation_msg = "Positive Trend: Cryptocurrencies and the Stock Market are moving up together."
+                elif corr_value < -0.4: correlation_msg = "Negative Trend: Cryptocurrencies are moving opposite to the Stock Market."
+                else: correlation_msg = "Neutral: Cryptocurrencies and the Stock Market are moving independently."
 
-            ml_prediction_msg = "Waiting for more data to predict..."
-            trend_signal, signal_color = "WAITING FOR DATA", "#FFA500" 
+            ml_prediction_msg = "Waiting for additional data points to generate prediction."
+            trend_signal, signal_color = "WAITING FOR DATA", "#1e3a5f" 
             
             btc_history = df[df['symbol'] == 'BTC'].sort_values('ingested_at')
             if len(btc_history) >= 2:
@@ -295,30 +266,30 @@ with col_viewport:
                 predicted_price = ml_model.predict(np.array([[len(btc_history)]]))[0]
                 
                 if predicted_price > y[-1]:
-                    trend_signal, signal_color = "UPWARD TREND PREDICTED", "#2E7D32" 
+                    trend_signal, signal_color = "UPWARD MARKET TREND PREDICTED", "#2e7d32" 
                 else:
-                    trend_signal, signal_color = "DOWNWARD TREND PREDICTED", "#C62828" 
-                ml_prediction_msg = f"Machine Learning expects the next price to be around: ${predicted_price:,.2f}."
+                    trend_signal, signal_color = "DOWNWARD MARKET TREND PREDICTED", "#c62828" 
+                ml_prediction_msg = f"The Linear Regression model anticipates the next price target to be: ${predicted_price:,.2f}"
 
-            st.markdown(f'<div class="signal-box" style="background-color: {signal_color};">PREDICTION: {trend_signal}</div>', unsafe_allow_html=True)
-            st.info(f"QUICK SUMMARY:\n\nMarket Correlation: {correlation_msg}\n\nPrice Forecast: {ml_prediction_msg}")
+            st.markdown(f'<div class="signal-box" style="background-color: {signal_color}; border-color: {signal_color};">{trend_signal}</div>', unsafe_allow_html=True)
+            st.info(f"ANALYTICS SUMMARY:\n\nMarket Correlation: {correlation_msg}\n\nPrice Forecast: {ml_prediction_msg}")
             
             col_c1, col_c2 = st.columns(2)
             with col_c1:
-                st.markdown("#### Crypto Prices")
+                st.markdown("#### CRYPTOCURRENCY PRICES")
                 crypto_cols = [c for c in pivot_df.columns if c != 'S&P500']
                 if crypto_cols: st.line_chart(pivot_df[crypto_cols].apply(pd.to_numeric))
             with col_c2:
-                st.markdown("#### Stock Market (S&P 500)")
+                st.markdown("#### STOCK MARKET (S&P 500)")
                 if 'S&P500' in pivot_df.columns:
                     sp_data = pivot_df[['S&P500']].apply(pd.to_numeric)
                     if len(sp_data) == 1: st.dataframe(sp_data, use_container_width=True)
                     else: st.line_chart(sp_data)
 
             st.markdown("---")
-            st.markdown("#### CURRENT PRICES")
+            st.markdown("#### LATEST ASSET PRICES")
             cols = st.columns(len(latest_df))
             for index, row in latest_df.reset_index().iterrows():
                 with cols[index]:
-                    if row['symbol'] == 'S&P500': st.metric(label="S&P 500 (Stock Market)", value=f"{float(row['priceUsd']):,.2f} PTS")
-                    else: st.metric(label=f"{row['symbol']} (Crypto)", value=f"${float(row['priceUsd']):,.2f}")
+                    if row['symbol'] == 'S&P500': st.metric(label="S&P 500 INDEX", value=f"{float(row['priceUsd']):,.2f} PTS")
+                    else: st.metric(label=f"{row['symbol']} ASSET", value=f"${float(row['priceUsd']):,.2f}")
