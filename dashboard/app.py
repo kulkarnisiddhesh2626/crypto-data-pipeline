@@ -61,72 +61,50 @@ st.markdown("""
     .signal-box { padding: 18px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; font-size: 16px; text-align: center; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); }
     .timestamp-badge { background-color: #263238; color: #4caf50 !important; font-family: monospace; padding: 4px 8px; border-radius: 2px; font-size: 11px; display: inline-block; border: 1px solid #4caf50; margin-top: 10px; }
     
-    /* 6-Step Workflow Robust Grid Layout */
-    .workflow-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 25px;
-        margin-top: 15px;
-        margin-bottom: 30px;
+    /* Perfect Vertical Flowchart Diagram */
+    .flow-container {
+        display: flex; flex-direction: column; gap: 10px; 
+        background-color: #132235; padding: 25px; 
+        border-radius: 8px; border: 1px solid #1e3a5f; margin-top: 15px; margin-bottom: 30px;
     }
-    @media (max-width: 1200px) {
-        .workflow-grid { grid-template-columns: repeat(2, 1fr); }
+    .flow-box {
+        display: flex; flex-direction: column;
+        background: #1a2a40; border-left: 6px solid #3a7bd5; 
+        border-radius: 4px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    @media (max-width: 768px) {
-        .workflow-grid { grid-template-columns: 1fr; }
+    .flow-header {
+        font-size: 16px; font-weight: bold; color: #ffffff; 
+        margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;
     }
-    .workflow-card {
-        background-color: #1a2a40;
-        border-top: 5px solid #3a7bd5;
-        border-radius: 6px;
-        padding: 22px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    .flow-content {
+        font-size: 14px; color: #a0b4c7; line-height: 1.7;
     }
-    .card-title {
-        color: #ffffff;
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 14px;
-        text-transform: uppercase;
-        border-bottom: 1px solid rgba(255,255,255,0.15);
-        padding-bottom: 8px;
-        letter-spacing: 1px;
+    .flow-content ul {
+        margin-top: 5px; margin-bottom: 0px; padding-left: 20px;
     }
-    .card-points {
-        color: #a0b4c7;
-        font-size: 14px;
-        line-height: 1.7;
+    .flow-content li {
+        margin-bottom: 6px; list-style-type: square;
     }
-    .card-points ul {
-        padding-left: 18px;
-        margin-top: 5px;
-        margin-bottom: 0px;
-    }
-    .card-points li {
-        margin-bottom: 8px;
-        list-style-type: square;
+    .flow-arrow {
+        text-align: center; color: #3a7bd5; font-size: 26px; font-weight: bold; margin: 0px; line-height: 1;
     }
     
-    /* Expandable About Project Module Display */
-    .about-box {
-        background-color: #132235;
-        border-left: 6px solid #4caf50;
-        padding: 25px;
-        border-radius: 6px;
-        margin-bottom: 30px;
-        margin-top: 10px;
-    }
-    .about-text {
-        color: #f0f4f8;
-        font-size: 17px; 
-        line-height: 1.8;
+    /* Clean Expandable About Project Styling */
+    .about-container {
+        background-color: #132235; border-left: 6px solid #4caf50;
+        padding: 25px; border-radius: 6px; margin-bottom: 25px; margin-top: 10px;
     }
     .about-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: #4caf50;
-        margin-bottom: 10px;
-        letter-spacing: 1px;
+        font-size: 18px; font-weight: bold; color: #4caf50; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .about-text {
+        color: #f0f4f8; font-size: 16px; line-height: 1.8;
+    }
+    .about-text ul {
+        margin-top: 10px; padding-left: 20px; margin-bottom: 0px;
+    }
+    .about-text li {
+        margin-bottom: 8px; list-style-type: square;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -173,7 +151,7 @@ col_viewport, col_controls = st.columns([3.0, 1.0])
 with col_controls:
     st.markdown("<br>", unsafe_allow_html=True) 
     
-    # Navigation Action Triggers
+    # 3 Identical Clean Action Buttons (No Symbols)
     if st.button("ABOUT PROJECT"):
         st.session_state.show_about = not st.session_state.show_about
         
@@ -199,97 +177,105 @@ with col_controls:
 with col_viewport:
     st.markdown("<h1 style='margin-top: 0px;'>DATA PIPELINE DASHBOARD</h1>", unsafe_allow_html=True)
     
-    # 1. EXPANDABLE ABOUT SECTION
+    # 1. EXPANDABLE ABOUT SECTION (Renders strictly inside a clean container)
     if st.session_state.show_about:
         st.markdown("""
-        <div class="about-box">
+        <div class="about-container">
             <div class="about-title">PROJECT OVERVIEW</div>
             <div class="about-text">
-                This platform represents an enterprise Data Engineering Lakehouse Dashboard built over a structured Medallion Architecture. 
-                By clicking the execution keys, the system initializes real-time endpoint hooks, handles raw target backups, normalizes unformatted arrays into high-efficiency schemas, and fits predictive time-series arrays using localized mathematical regression matrix blocks.
+                This platform represents an enterprise Data Engineering Lakehouse Dashboard built over a structured Medallion Architecture. By triggering the pipeline, the system performs the following actions programmatically:
+                <ul>
+                    <li><b>Multi-Source Extraction:</b> Connects to live financial network APIs (Cryptocurrency and S&P 500 Equities).</li>
+                    <li><b>Data Lake Storage:</b> Creates immutable backups of raw JSON payloads directly to local disk.</li>
+                    <li><b>Transformation Engine:</b> Cleans, maps, and compresses data arrays into columnar Parquet files.</li>
+                    <li><b>Relational Warehouse:</b> Loads finalized schemas into a highly indexed SQL database for time-series querying.</li>
+                    <li><b>Machine Learning Core:</b> Fits mathematical regression models to the historical database arrays to forecast target prices.</li>
+                </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # 2. RESTORED: FULL DETAILED 6-STEP ARCHITECTURE WORKFLOW
-    st.markdown("### ARCHITECTURE WORKFLOW")
-    st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The blueprint matrix below handles the end-to-end lineage map of our financial reporting network.</p>", unsafe_allow_html=True)
-    
-    st.markdown(f"""
-    <div class="workflow-grid">
-        <div class="workflow-card" style="border-top-color: #4caf50;">
-            <div class="card-title">1. DATA INGESTION</div>
-            <div class="card-points">
-                <ul>
-                    <li>Connects via secure HTTP REST requests directly to the live CoinCap network API.</li>
-                    <li>Fetches the S&P 500 macro equity index from financial networks via Yahoo Finance.</li>
-                    <li>Implements strict try/except fault tolerance and error boundaries to intercept network dropped states.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="workflow-card" style="border-top-color: #cd7f32;">
-            <div class="card-title">2. BRONZE LAYER</div>
-            <div class="card-points">
-                <ul>
-                    <li>Acts as an immutable local landing zone structure replicating a distributed Data Lake pattern.</li>
-                    <li>Saves the exact stringified raw JSON network response payload directly to the storage directory.</li>
-                    <li>Guarantees absolute data lineage capabilities and data recovery mechanisms if schemas shift downstream.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="workflow-card" style="border-top-color: #c0c0c0;">
-            <div class="card-title">3. SILVER LAYER</div>
-            <div class="card-points">
-                <ul>
-                    <li>Processes raw structures using Python Pandas analytics runtimes and PyArrow compilation engines.</li>
-                    <li>Standardizes missing dimensions, drops redundant keys, and explicitly casts alphanumeric strings to typed floats.</li>
-                    <li>Compresses localized metrics into binary columnar Parquet tables to optimize resource constraints.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="workflow-card" style="border-top-color: #ffd700;">
-            <div class="card-title">4. GOLD LAYER</div>
-            <div class="card-points">
-                <ul>
-                    <li>Maps refined tabular silver Parquet arrays directly into a relational SQLite database structure.</li>
-                    <li>Enforces an optimized schema with dedicated indexes for high-speed reporting queries.</li>
-                    <li>Appends structured database timestamp logs on insertion to allow continuous historical audit checks.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="workflow-card" style="border-top-color: #3a7bd5;">
-            <div class="card-title">5. SERVING UI</div>
-            <div class="card-points">
-                <ul>
-                    <li>Renders an interactive, responsive front-end layer via the Streamlit data application frame.</li>
-                    <li>Computes Pearson mathematical correlation tracking metrics dynamically between isolated asset categories.</li>
-                    <li>Displays structural data lineage stats, disk compression metrics, and dual-axis chart matrices.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="workflow-card" style="border-top-color: #9c27b0;">
-            <div class="card-title">6. PREDICTIVE ML</div>
-            <div class="card-points">
-                <ul>
-                    <li>Calls Scikit-Learn analytical modules to establish a linear machine learning tracking layer.</li>
-                    <li>Queries structural gold warehouse logs to fit mathematical trendlines over complex price variations.</li>
-                    <li>Generates targeted asset valuation targets projecting figures forward to the subsequent runtime step.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # 3. CONDITIONAL PIPELINE STATE CONTENT
+    # 2. THE 6-STEP VERTICAL WORKFLOW DIAGRAM (Cannot be squeezed or broken)
     if not st.session_state.pipeline_executed:
-        st.info("Pipeline State: Idle. Click 'EXECUTE PIPELINE' on the right panel to trigger calculations, run storage checks, and populate the analytics matrix.")
+        st.markdown("### ARCHITECTURE WORKFLOW")
+        st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The blueprint below handles the end-to-end lineage map of our financial reporting network.</p>", unsafe_allow_html=True)
+        
+        st.markdown(f"""
+        <div class="flow-container">
+            <div class="flow-box" style="border-left-color: #4caf50;">
+                <div class="flow-header">1. DATA INGESTION</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Connects via secure HTTP REST requests directly to the live CoinCap network API.</li>
+                        <li>Fetches the S&P 500 macro equity index from financial networks via Yahoo Finance.</li>
+                        <li>Implements strict fault tolerance and error boundaries to intercept network dropped states.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flow-arrow">&#8595;</div>
+            
+            <div class="flow-box" style="border-left-color: #cd7f32;">
+                <div class="flow-header">2. BRONZE LAYER</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Acts as an immutable local landing zone structure replicating a distributed Data Lake pattern.</li>
+                        <li>Saves the exact stringified raw JSON network response payload directly to the storage directory.</li>
+                        <li>Guarantees absolute data lineage capabilities and data recovery mechanisms if schemas shift downstream.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flow-arrow">&#8595;</div>
+            
+            <div class="flow-box" style="border-left-color: #c0c0c0;">
+                <div class="flow-header">3. SILVER LAYER</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Processes raw structures using Python Pandas analytics runtimes and PyArrow compilation engines.</li>
+                        <li>Standardizes missing dimensions, drops redundant keys, and explicitly casts alphanumeric strings to typed floats.</li>
+                        <li>Compresses localized metrics into binary columnar Parquet tables to optimize resource constraints.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flow-arrow">&#8595;</div>
+            
+            <div class="flow-box" style="border-left-color: #ffd700;">
+                <div class="flow-header">4. GOLD LAYER</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Maps refined tabular silver Parquet arrays directly into a relational SQLite database structure.</li>
+                        <li>Enforces an optimized schema with dedicated indexes for high-speed reporting queries.</li>
+                        <li>Appends structured database timestamp logs on insertion to allow continuous historical audit checks.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flow-arrow">&#8595;</div>
+            
+            <div class="flow-box" style="border-left-color: #3a7bd5;">
+                <div class="flow-header">5. SERVING UI</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Renders an interactive, responsive front-end layer via the Streamlit data application frame.</li>
+                        <li>Computes Pearson mathematical correlation tracking metrics dynamically between isolated asset categories.</li>
+                        <li>Displays structural data lineage stats, disk compression metrics, and dual-axis chart matrices.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flow-arrow">&#8595;</div>
+            
+            <div class="flow-box" style="border-left-color: #9c27b0;">
+                <div class="flow-header">6. PREDICTIVE ML</div>
+                <div class="flow-content">
+                    <ul>
+                        <li>Calls Scikit-Learn analytical modules to establish a linear machine learning tracking layer.</li>
+                        <li>Queries structural gold warehouse logs to fit mathematical trendlines over complex price variations.</li>
+                        <li>Generates targeted asset valuation targets projecting figures forward to the subsequent runtime step.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # 3. CONDITIONAL PIPELINE METRICS (Appears when executed)
     else:
         # Load Operational Data
         conn = sqlite3.connect('data/crypto_warehouse.db')
