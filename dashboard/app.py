@@ -61,35 +61,41 @@ st.markdown("""
     .signal-box { padding: 18px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; font-size: 16px; text-align: center; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); }
     .timestamp-badge { background-color: #263238; color: #4caf50 !important; font-family: monospace; padding: 4px 8px; border-radius: 2px; font-size: 11px; display: inline-block; border: 1px solid #4caf50; margin-top: 10px; }
     
-    /* 6-Step Workflow Grid (Fixed Layout) */
+    /* 6-Step Workflow Robust Grid Layout */
     .workflow-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 25px;
         margin-top: 15px;
         margin-bottom: 30px;
     }
+    @media (max-width: 1200px) {
+        .workflow-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+        .workflow-grid { grid-template-columns: 1fr; }
+    }
     .workflow-card {
         background-color: #1a2a40;
-        border-top: 4px solid #3a7bd5;
+        border-top: 5px solid #3a7bd5;
         border-radius: 6px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        padding: 22px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     }
     .card-title {
         color: #ffffff;
         font-size: 16px;
         font-weight: bold;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
         text-transform: uppercase;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.15);
         padding-bottom: 8px;
         letter-spacing: 1px;
     }
     .card-points {
         color: #a0b4c7;
         font-size: 14px;
-        line-height: 1.6;
+        line-height: 1.7;
     }
     .card-points ul {
         padding-left: 18px;
@@ -97,11 +103,11 @@ st.markdown("""
         margin-bottom: 0px;
     }
     .card-points li {
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         list-style-type: square;
     }
     
-    /* About Project Styling (Large Font & Expandable Layout) */
+    /* Expandable About Project Module Display */
     .about-box {
         background-color: #132235;
         border-left: 6px solid #4caf50;
@@ -112,7 +118,7 @@ st.markdown("""
     }
     .about-text {
         color: #f0f4f8;
-        font-size: 18px; 
+        font-size: 17px; 
         line-height: 1.8;
     }
     .about-title {
@@ -167,7 +173,7 @@ col_viewport, col_controls = st.columns([3.0, 1.0])
 with col_controls:
     st.markdown("<br>", unsafe_allow_html=True) 
     
-    # Control Buttons
+    # Navigation Action Triggers
     if st.button("ABOUT PROJECT"):
         st.session_state.show_about = not st.session_state.show_about
         
@@ -193,23 +199,21 @@ with col_controls:
 with col_viewport:
     st.markdown("<h1 style='margin-top: 0px;'>DATA PIPELINE DASHBOARD</h1>", unsafe_allow_html=True)
     
-    # 1. EXPANDABLE ABOUT SECTION (Stays at the top when toggled)
+    # 1. EXPANDABLE ABOUT SECTION
     if st.session_state.show_about:
         st.markdown("""
         <div class="about-box">
             <div class="about-title">PROJECT OVERVIEW</div>
             <div class="about-text">
-                This platform represents a complete Data Engineering Lakehouse Pipeline built on the Medallion Architecture. 
-                It programmatically extracts live financial data from multiple network APIs, creates immutable storage backups, 
-                cleans and compresses the data into columnar Parquet files, and loads it into a relational SQL database. 
-                Finally, it utilizes the structured data to generate localized Machine Learning market forecasts.
+                This platform represents an enterprise Data Engineering Lakehouse Dashboard built over a structured Medallion Architecture. 
+                By clicking the execution keys, the system initializes real-time endpoint hooks, handles raw target backups, normalizes unformatted arrays into high-efficiency schemas, and fits predictive time-series arrays using localized mathematical regression matrix blocks.
             </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # 2. PERMANENT ARCHITECTURE WORKFLOW (Always visible here)
+    # 2. RESTORED: FULL DETAILED 6-STEP ARCHITECTURE WORKFLOW
     st.markdown("### ARCHITECTURE WORKFLOW")
-    st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The grid below outlines the 6 distinct steps of the enterprise data lifecycle.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #a0b4c7; font-size: 16px;'>The blueprint matrix below handles the end-to-end lineage map of our financial reporting network.</p>", unsafe_allow_html=True)
     
     st.markdown(f"""
     <div class="workflow-grid">
@@ -217,9 +221,9 @@ with col_viewport:
             <div class="card-title">1. DATA INGESTION</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Source:</b> Network APIs</li>
-                    <li><b>Target:</b> Crypto and Equities</li>
-                    <li><b>Action:</b> Secure HTTP Requests</li>
+                    <li>Connects via secure HTTP REST requests directly to the live CoinCap network API.</li>
+                    <li>Fetches the S&P 500 macro equity index from financial networks via Yahoo Finance.</li>
+                    <li>Implements strict try/except fault tolerance and error boundaries to intercept network dropped states.</li>
                 </ul>
             </div>
         </div>
@@ -228,9 +232,9 @@ with col_viewport:
             <div class="card-title">2. BRONZE LAYER</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Format:</b> Raw JSON</li>
-                    <li><b>Storage:</b> Local Data Lake</li>
-                    <li><b>Purpose:</b> Immutable Backup</li>
+                    <li>Acts as an immutable local landing zone structure replicating a distributed Data Lake pattern.</li>
+                    <li>Saves the exact stringified raw JSON network response payload directly to the storage directory.</li>
+                    <li>Guarantees absolute data lineage capabilities and data recovery mechanisms if schemas shift downstream.</li>
                 </ul>
             </div>
         </div>
@@ -239,9 +243,9 @@ with col_viewport:
             <div class="card-title">3. SILVER LAYER</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Format:</b> Columnar Parquet</li>
-                    <li><b>Process:</b> Schema Mapping</li>
-                    <li><b>Benefit:</b> High Compression</li>
+                    <li>Processes raw structures using Python Pandas analytics runtimes and PyArrow compilation engines.</li>
+                    <li>Standardizes missing dimensions, drops redundant keys, and explicitly casts alphanumeric strings to typed floats.</li>
+                    <li>Compresses localized metrics into binary columnar Parquet tables to optimize resource constraints.</li>
                 </ul>
             </div>
         </div>
@@ -250,9 +254,9 @@ with col_viewport:
             <div class="card-title">4. GOLD LAYER</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Format:</b> SQLite Database</li>
-                    <li><b>Schema:</b> Relational Tables</li>
-                    <li><b>Feature:</b> Time-Series Logs</li>
+                    <li>Maps refined tabular silver Parquet arrays directly into a relational SQLite database structure.</li>
+                    <li>Enforces an optimized schema with dedicated indexes for high-speed reporting queries.</li>
+                    <li>Appends structured database timestamp logs on insertion to allow continuous historical audit checks.</li>
                 </ul>
             </div>
         </div>
@@ -261,9 +265,9 @@ with col_viewport:
             <div class="card-title">5. SERVING UI</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Platform:</b> Streamlit</li>
-                    <li><b>Visuals:</b> Dual-Axis Charts</li>
-                    <li><b>Math:</b> Pearson Correlation</li>
+                    <li>Renders an interactive, responsive front-end layer via the Streamlit data application frame.</li>
+                    <li>Computes Pearson mathematical correlation tracking metrics dynamically between isolated asset categories.</li>
+                    <li>Displays structural data lineage stats, disk compression metrics, and dual-axis chart matrices.</li>
                 </ul>
             </div>
         </div>
@@ -272,9 +276,9 @@ with col_viewport:
             <div class="card-title">6. PREDICTIVE ML</div>
             <div class="card-points">
                 <ul>
-                    <li><b>Engine:</b> Scikit-Learn</li>
-                    <li><b>Model:</b> Linear Regression</li>
-                    <li><b>Output:</b> Target Forecasts</li>
+                    <li>Calls Scikit-Learn analytical modules to establish a linear machine learning tracking layer.</li>
+                    <li>Queries structural gold warehouse logs to fit mathematical trendlines over complex price variations.</li>
+                    <li>Generates targeted asset valuation targets projecting figures forward to the subsequent runtime step.</li>
                 </ul>
             </div>
         </div>
@@ -283,7 +287,7 @@ with col_viewport:
 
     st.markdown("---")
 
-    # 3. CONDITIONAL PIPELINE STATE CONTENT (Appears beneath the workflow)
+    # 3. CONDITIONAL PIPELINE STATE CONTENT
     if not st.session_state.pipeline_executed:
         st.info("Pipeline State: Idle. Click 'EXECUTE PIPELINE' on the right panel to trigger calculations, run storage checks, and populate the analytics matrix.")
     else:
